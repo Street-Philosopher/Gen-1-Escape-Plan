@@ -1,45 +1,46 @@
-; !!IMPORTANTE!! !!PRIMA DI INIZIARE BISOGNA SETTARE IL BOX AL BOX 1!!
+; first box
+; (33*20) + 1 bytes of information
 
-; primo box
-; (33*20) + 1 bytes di informazioni
+BLACK_SQUARE = $54
+WHITE_FRAME  = $55
 
     org $d901
 
     ld hl,$ff41
     ld a,$63
 vb:
-	bit 0,(hl)                                          ; spegne lo schermo
+	bit 0,(hl)                                      ; turn off screen
 	jr nz,vb
     ldh ($40),a
 
     ld a,0
-	ldh ($d7),a											; blocca le animazioni dei tiles
+	ldh ($d7),a					; block tile animations
 
 fillScreen:
 	ld hl,$9800
 	ld b,$64
-	ld a,$54
+	ld a,BLACK_SQUARE
 fs_loop1:
 	ldi (hl),a
 	dec b
-	jr nz,fs_loop1               ; prima parte della cornice (3 righe e qualcosa)
-	ld a,$55
+	jr nz,fs_loop1               ; black background
+	ld a,WHITE_FRAME
 	ld b,$0c
 fs_loop2:
-	ldi (hl),a                   ; cornice bianca
+	ldi (hl),a                   ; white frame
 	dec b
 	jr nz,fs_loop2
 
-    ld a,0                       ; da tile 0 a tile 82
-    ld d,8                       ; 8 righe
+    ld a,0                       ; go from tile 0 to tile (decimal)82
+    ld d,8                       ; we have 8 rows
 dataLoop:
     ld b,20
-fs_loop3:                        ; nuova riga
-	ld (hl),$54
+fs_loop3:                        ; new row
+    ld (hl),BLACK_SQUARE
     inc hl
     dec b
     jr nz,fs_loop3
-    ld (hl),$55                  ; tile bianco di inizio riga
+    ld (hl),WHITE_FRAME          ; white tile in the beginning of the row
     inc hl
 
     ld b,10                      ; 10 dati per riga max
@@ -48,7 +49,7 @@ fs_loop4:
     inc a
     dec b
     jr nz,fs_loop4
-    ld (hl),$55                  ; tile bianco di fine dati
+    ld (hl),WHITE_FRAME          ; one white tile for end data
     inc hl
 
     dec d
@@ -57,7 +58,7 @@ fs_loop4:
     ; ultima riga
     ld b,20
 fs_loop6:
-    ld (hl),$54
+    ld (hl),BLACK_SQUARE
     inc hl                       ; nuova riga
     dec b
     jr nz,fs_loop6
@@ -81,7 +82,7 @@ fs_loop7:                        ; cornice lunga fine ultima riga
 
     ; nuova riga, prima di finire la cornice
     ld b,20
-    ld a,$54
+    ld a,BLACK_SQUARE
 fs_loop8:
     ldi (hl),a
     dec b
@@ -96,7 +97,7 @@ fs_loop69:
     jr nz,fs_loop69
     ; tile neri per coprire lo schermo intero
     ld b,$84
-    ld a,$54
+    ld a,BLACK_SQUARE
 final_loop:
     ldi (hl),a
     dec b
