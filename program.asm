@@ -18,7 +18,7 @@ vb:
     ld a,0
 	ldh ($d7),a					; block tile animations by loading 0 in $ffd7
 
-; this will overwrite the current map data to show on screen 82 unique tiles, that will then be overwritten to show our data
+; this will overwrite the current map data to show on screen a frame (black and white) containing different tiles
 ; hl will hold the VRAM address to write the tile number to
 ; a is the tile number we want to write next
 ; b and d are used as counters
@@ -26,18 +26,18 @@ fillScreen:
 	ld hl,$9800
 	ld b,$64
 	ld a,BLACK_SQUARE
-fs_loop1:					; start by adding black squares to make the frame
+fs_loop1:						; start by adding black squares to make the frame
 	ldi (hl),a
 	dec b
-	jr nz,fs_loop1               ; black background
+	jr nz,fs_loop1
 	ld a,WHITE_FRAME
 	ld b,$0c
 fs_loop2:
-	ldi (hl),a                   ; white frame
+	ldi (hl),a             		; draws one line of white frame
 	dec b
 	jr nz,fs_loop2
 
-    ld a,0                       ; go from tile 0 to tile (decimal)82
+    ld a,0                       ; initialise a to 0
     ld d,8                       ; we have 8 lines in the code
 dataLoop:
     ld b,20
@@ -54,39 +54,40 @@ fs_loop4:
     ldi (hl),a                   ; we write the tile number to VRAM, then increase VRAM pointer to go to next tile
     inc a						 ; increase tile number
     dec b						 ; decrease line tile counter
-    jr nz,fs_loop4
-    ld (hl),WHITE_FRAME          ; one white tile for frame
+    jr nz,fs_loop4 				 ; repeated 10 times, drawing 10 tiles in current row
+	
+    ld (hl),WHITE_FRAME          ; one white tile for right frame
     inc hl
 
     dec d
-    jr nz,dataLoop
+    jr nz,dataLoop				 ; makes it so we repeat "d" (number of lines) times
 
-    ; ultima riga
+    ; the last line is different, having only 4 tiles we need to show. for this reason it has a separate part of the function
     ld b,20
 fs_loop6:
     ld (hl),BLACK_SQUARE
-    inc hl                       ; nuova riga
+    inc hl                       ; new line
     dec b
     jr nz,fs_loop6
 
     ld (hl),WHITE_FRAME
-    inc hl                       ; tile bianco
+    inc hl
 
     ldi (hl),a
     inc a
     ldi (hl),a
-    inc a
+    inc a						; 4 tiles, then a white tile
     ldi (hl),a
     inc a
     ldi (hl),a
     ld a,WHITE_FRAME
     ld b,7
-fs_loop7:                        ; cornice lunga fine ultima riga
+fs_loop7:                        ; since we only have 4 data tiles, we fill the other 6 tiles in the line with white frame tiles
     ldi (hl),a
     dec b
     jr nz,fs_loop7
 
-    ; nuova riga, prima di finire la cornice
+    ; last new line
     ld b,20
     ld a,BLACK_SQUARE
 fs_loop8:
@@ -94,14 +95,14 @@ fs_loop8:
     dec b
     jr nz,fs_loop8
     
-    ; fondo della cornice
+    ; bottom row of the frame
     ld b,12
     ld a,WHITE_FRAME
 fs_loop69:
     ldi (hl),a
     dec b
     jr nz,fs_loop69
-    ; tile neri per coprire lo schermo intero
+    ; after the white frame, we cover the rest of the screen with black tiles
     ld b,$84
     ld a,BLACK_SQUARE
 final_loop:
@@ -109,7 +110,7 @@ final_loop:
     dec b
     jr nz,final_loop
 end_fs:
-    ; fine di fillscreen. this is where the fun begins
+;END OF FILLSCREEN
 	
     ; probabilmente si puo ottimizzare mettendolo dopo ilr esto dei dati, ma fa nulla
     ld hl,$9540
