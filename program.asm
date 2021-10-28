@@ -1,6 +1,7 @@
 ; first box
 ; (33*20) + 1 bytes of information
 
+; tile index of the completely black and completely white tiles, used for the frame
 BLACK_SQUARE = $54
 WHITE_FRAME  = $55
 
@@ -63,7 +64,7 @@ fs_loop6:
     dec b
     jr nz,fs_loop6
 
-    ld (hl),$55
+    ld (hl),WHITE_FRAME
     inc hl                       ; tile bianco
 
     ldi (hl),a
@@ -73,7 +74,7 @@ fs_loop6:
     ldi (hl),a
     inc a
     ldi (hl),a
-    ld a,$55
+    ld a,WHITE_FRAME
     ld b,7
 fs_loop7:                        ; cornice lunga fine ultima riga
     ldi (hl),a
@@ -90,7 +91,7 @@ fs_loop8:
     
     ; fondo della cornice
     ld b,12
-    ld a,$55
+    ld a,WHITE_FRAME
 fs_loop69:
     ldi (hl),a
     dec b
