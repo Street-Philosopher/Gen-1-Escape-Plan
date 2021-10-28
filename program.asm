@@ -13,31 +13,31 @@ BOX_DATA = $da96
     ld hl,$ff41
     ld a,$63
 vb:
-	bit 0,(hl)                                      ; turn off screen
-	jr nz,vb
+    bit 0,(hl)                                      ; turn off screen
+    jr nz,vb
     ldh ($40),a
 
     ld a,0
-	ldh ($d7),a					; block tile animations by loading 0 in $ffd7
+    ldh ($d7),a					; block tile animations by loading 0 in $ffd7
 
 ; this will overwrite the current map data to show on screen a frame (black and white) containing different tiles
 ; hl will hold the VRAM address to write the tile number to
 ; a is the tile number we want to write next
 ; b and d are used as counters
 fillScreen:
-	ld hl,$9800
-	ld b,$64
-	ld a,BLACK_SQUARE
+    ld hl,$9800
+    ld b,$64
+    ld a,BLACK_SQUARE
 fs_loop1:						; start by adding black squares to make the frame
-	ldi (hl),a
-	dec b
-	jr nz,fs_loop1
-	ld a,WHITE_FRAME
-	ld b,$0c
+    ldi (hl),a
+    dec b
+    jr nz,fs_loop1
+    ld a,WHITE_FRAME
+    ld b,$0c
 fs_loop2:
-	ldi (hl),a             		; draws one line of white frame
-	dec b
-	jr nz,fs_loop2
+    ldi (hl),a             		; draws one line of white frame
+    dec b
+    jr nz,fs_loop2
 
     ld a,0                       ; initialise a to 0
     ld d,8                       ; we have 8 lines in the code
