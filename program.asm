@@ -4,6 +4,7 @@
 ; tile index of the completely black and completely white tiles, used for the frame
 BLACK_SQUARE = $54
 WHITE_FRAME  = $55
+ld a,0
 
 ; in the game boy the payload will be written starting at this address
     org $d901
