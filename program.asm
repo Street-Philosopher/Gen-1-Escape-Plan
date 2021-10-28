@@ -4,7 +4,8 @@
 ; tile index of the completely black and completely white tiles, used for the frame
 BLACK_SQUARE = $54
 WHITE_FRAME  = $55
-ld a,0
+
+BOX_DATA = $da96
 
 ; in the game boy the payload will be written starting at this address
     org $d901
@@ -113,39 +114,46 @@ final_loop:
 end_fs:
 ;END OF FILLSCREEN
 	
-    ; probabilmente si puo ottimizzare mettendolo dopo ilr esto dei dati, ma fa nulla
-    ld hl,$9540
+	
+
+; probably can be optimised if I put it after the rest of the data, but it's fine for now
+; overwrites white and black tiles to be actually white or black
+    ld hl,$9540			; writes to the black tile
     ld a,$ff
 overwrite_5455:
     ld b,$10
-loop1:                          ; prima scrive 16 volte 0, poi sottrae 1 da A e se il risultato � FF allora ripete sottraendo FF
+loop1:                          ; write 16 times ff to create black tile, then adds one to write 00, which creates white tile. this way i don't have to rewrite the function
     ldi (hl),a
     dec b
-    jr nz,loop1
+    jr nz,loop1			; write all 16 bytes as a sprite is 16 bytes long
+    
+    ; adds one, and jumps back to the start if there was an overflow. this way we only jump the first time (as "a" contains ff), AND we get the correct value for "a" to write
+    ; O P T I M I S A T I O N S
     add a,1                     ; in questo modo il prossimo jump verrà eserguito solo la prima volta. devo usare "add" perche "inc" non imposta l'overflow
     jr c,overwrite_5455         ; se posso, penso che sia una soluzione piuttosto intelligente
 
+; this overwrites the tile data with our data
 overwriteStuff:
-    ld d,$53
-    ld bc,$9000
-    ld hl,$da96
+    ld d,$53       		; we do this for 0x53 (84, since we count 0) tiles
+    ld bc,$9000   		; that's where VRAM for tiles starts
+    ld hl,BOX_DATA
 overwriteStuffLoop2:
-    ld e,8
+    ld e,8 			; every tile has 8 bytes
 overwriteStuffLoop:
-    ldi a,(hl)
-    ld (bc),a
-    inc bc
-    ld a,$ff
-    ld (bc),a
+    ldi a,(hl)  		; write our byte and increase the pointer to go to the next one
+    ld (bc),a			; load the data in VRAM
+    inc bc			; increase VRAM pointer
+    ld a,$ff  			; i found out by writing any byte and then "ff" a black-on-white binary representation of that byte will be shown on the sprite
+    ld (bc),a			; write ff to VRAM and increase
     inc bc
     dec e
-    jr nz,overwriteStuffLoop
+    jr nz,overwriteStuffLoop 	; this will loop for all bytes in the tile
     dec d
-    jr nz,overwriteStuffLoop2
+    jr nz,overwriteStuffLoop2	; will loop for every tile in the code
 
-; gli ultimi 12 byte, a parte l'ultimo, sono spazzatura: l'ultimo contiene il numero di pokémon validi nel box, così l'interprete non fa uscire pokémon invalidi
+; last twelve bytes are useless except the last one which contains the number of valid pokémon in the box, this way we don't decode invalid data
 writeMonNumber:
-    ld hl, $da79
+    ld hl, $da79 ; starts 7 bytes before the "number of pokémon in box" byte, this way it gets written as the last one
     ld e,8
 wmnLoop:
     ldi a,(hl)
@@ -159,5 +167,6 @@ wmnLoop:
 
     ld a,$e1
     ldh ($40),a
-
-    ret
+; END OF OVERWRITE 
+   
+    ret   ; end of the program. return to avoid catastrophes
