@@ -16,6 +16,7 @@ VBlankCheck:
     jr nz,VBlankCheck   ; if the previous result was not $91 go back
     ld a,$63      	; else turn off the screen
     ldh ($40),a
+;end of vblankcheck
 
     ld a,0
     ldh ($d7),a			; block tile animations by loading 0 in $ffd7. otherwise tiles like flowers would constantly change, breaking our image
