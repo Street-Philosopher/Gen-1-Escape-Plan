@@ -11,10 +11,10 @@ BOX_DATA = $da96
 ; these few lines will be for preparation
     di ; Disable Interrupts
 VBlankCheck:
-    ldh a,($44)    ; vertical position of scanline
-    cp a, $91      ; when it's $91 we just entered VBlank
-    jr nz,vb       ; if the previous result was not $91 go back
-    ld a,$63       ; else turn off the screen
+    ldh a,($44)    	; vertical position of scanline
+    cp a, $91      	; when it's $91 we just entered VBlank
+    jr nz,VBlankCheck   ; if the previous result was not $91 go back
+    ld a,$63      	; else turn off the screen
     ldh ($40),a
 
     ld a,0
