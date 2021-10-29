@@ -1,8 +1,0 @@
-{
-  "runtimeOptions": {
-    "additionalProbingPaths": [
-      "C:\\Users\\Craft\\.dotnet\\store\\|arch|\\|tfm|",
-      "C:\\Users\\Craft\\.nuget\\packages"
-    ]
-  }
-}
