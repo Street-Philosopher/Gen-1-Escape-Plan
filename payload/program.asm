@@ -8,17 +8,13 @@ WHITE_FRAME  = $55
 ; memory address for stored pokémon data
 BOX_DATA = $da96
 
-; this isn't really necessary, but I like it here
-    org $d901
-
 ; these few lines will be for preparation
-    ld hl,$ff41
-    ld a,$63
 VBlankCheck:
-    bit 0,(hl) 			; check if we're in VBlank
-    jr nz,VBlankCheck 		; if not, repeat the loop
-    ldh ($40),a			; this is the "LCD Settings" address. by loading $63 into it we're turning the screen off and disabling sprites
-				; it's necessary because of some weird GameBoy mechanic called VBlank
+    ldh a,($44)    ; vertical position of scanline
+    cp a, $91      ; when it's $91 we just entered VBlank
+    jr nz,vb       ; if the previous result was not $91 go back
+    ld a,$63       ; else turn off the screen
+    ldh ($40),a
 
     ld a,0
     ldh ($d7),a			; block tile animations by loading 0 in $ffd7. otherwise tiles like flowers would constantly change, breaking our image
