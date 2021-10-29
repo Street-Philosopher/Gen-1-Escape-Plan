@@ -9,6 +9,7 @@ WHITE_FRAME  = $55
 BOX_DATA = $da96
 
 ; these few lines will be for preparation
+di ; Disable Interrupts
 VBlankCheck:
     ldh a,($44)    ; vertical position of scanline
     cp a, $91      ; when it's $91 we just entered VBlank
@@ -173,4 +174,5 @@ wmnLoop:
     ld a,$e1     ; loading $e1 in the LCD settings will cause them to turn the screen back on, but not the sprites. this way the player sprite doesn't cover the image
     ldh ($40),a
    
+    ei 		; before closing, re enable interrupts
     ret   ; end of the program. return to avoid catastrophes when executing
