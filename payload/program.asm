@@ -9,7 +9,7 @@ WHITE_FRAME  = $55
 BOX_DATA = $da96
 
 ; these few lines will be for preparation
-di ; Disable Interrupts
+    di ; Disable Interrupts
 VBlankCheck:
     ldh a,($44)    ; vertical position of scanline
     cp a, $91      ; when it's $91 we just entered VBlank
