@@ -5,25 +5,29 @@
 BLACK_SQUARE = $54
 WHITE_FRAME  = $55
 
+; memory address for stored pokémon data
 BOX_DATA = $da96
 
-; in the game boy the payload will be written starting at this address
+; this isn't really necessary, but I like it here
     org $d901
 
+; these few lines will be for preparation
     ld hl,$ff41
     ld a,$63
-vb:
-    bit 0,(hl)                                      ; turn off screen
-    jr nz,vb
-    ldh ($40),a
+VBlankCheck:
+    bit 0,(hl) 			; check if we're in VBlank
+    jr nz,VBlankCheck 		; if not, repeat the loop
+    ldh ($40),a			; this is the "LCD Settings" address. by loading $63 into it we're turning the screen off and disabling sprites
+				; it's necessary because of some weird GameBoy mechanic called VBlank
 
     ld a,0
-    ldh ($d7),a					; block tile animations by loading 0 in $ffd7
+    ldh ($d7),a			; block tile animations by loading 0 in $ffd7. otherwise tiles like flowers would constantly change, breaking our image
+;END OF PREPARATION
 
 ; this will overwrite the current map data to show on screen a frame (black and white) containing different tiles
-; hl will hold the VRAM address to write the tile number to
-; a is the tile number we want to write next
-; b and d are used as counters
+; "hl" will hold the VRAM address containing current tile data, so we can overwrite the map at our likings
+; "a" is the tile number we want to write next
+; "b" and "d" are used as counters
 fillScreen:
     ld hl,$9800
     ld b,$64
@@ -39,7 +43,7 @@ fs_loop2:
     dec b
     jr nz,fs_loop2
 
-    ld a,0                       ; initialise a to 0
+    ld a,0                       ; initialise a to 0, this is where the tiling starts
     ld d,8                       ; we have 8 lines in the code
 dataLoop:
     ld b,20
@@ -129,9 +133,13 @@ loop1:                          ; write 16 times ff to create black tile, then a
     
     ; adds one, and jumps back to the start if there was an overflow. this way we only jump the first time (as "a" contains ff), AND we get the correct value for "a" to write
     ; O P T I M I S A T I O N S
-    add a,1                     ; in questo modo il prossimo jump verrà eserguito solo la prima volta. devo usare "add" perche "inc" non imposta l'overflow
+    add a,1                     ; we use "add 1" and not "inc" because "inc" does not set the overflow flag
     jr c,overwrite_5455         ; se posso, penso che sia una soluzione piuttosto intelligente
 
+; here "d" is used as a counter for the tiles we still have to overwrite
+; "bc" contains the VRAM address containing sprite data, the one we'll need to overwrite
+; "hl" contains the address containing box data
+; "e" is also used as a counter simply because otherwise the number to load in "d" would be too large. it counts the number of bytes in each tile (8)
 ; this overwrites the tile data with our data
 overwriteStuff:
     ld d,$53       		; we do this for 0x53 (84, since we count 0) tiles
@@ -147,7 +155,7 @@ overwriteStuffLoop:
     ld (bc),a			; write ff to VRAM and increase
     inc bc
     dec e
-    jr nz,overwriteStuffLoop 	; this will loop for all bytes in the tile
+    jr nz,overwriteStuffLoop 	; will loop for all bytes in the tile
     dec d
     jr nz,overwriteStuffLoop2	; will loop for every tile in the code
 
@@ -164,9 +172,9 @@ wmnLoop:
     inc bc
     dec e
     jr nz, wmnLoop
-
-    ld a,$e1
-    ldh ($40),a
 ; END OF OVERWRITE 
+
+    ld a,$e1     ; loading $e1 in the LCD settings will cause them to turn the screen back on, but not the sprites. this way the player sprite doesn't cover the image
+    ldh ($40),a
    
-    ret   ; end of the program. return to avoid catastrophes
+    ret   ; end of the program. return to avoid catastrophes when executing
