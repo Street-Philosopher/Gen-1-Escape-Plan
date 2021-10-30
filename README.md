@@ -6,7 +6,7 @@ When executed, it will read the data for the pokémon in your current box, and t
 I made this as a way to transfer pokémon from gen1, as you can't do it normally: there are many other ways of doing it, but usually they all require some external device to read your save file, and I didn't want to buy something that I would never use again after this. Instead, the idea behind this program is being able to do it with just your GameBoy, a smartphone, and some patience.
 
 # Usage
-First step is to execute the ACE program. Find any setup that you like (i reccomend this one: https://www.youtube.com/watch?v=D3EvpRHL_vk) and write the program you find in "bytes.txt".
+First step is to execute the ACE program. Find any setup that you like (i reccomend this one: https://www.youtube.com/watch?v=D3EvpRHL_vk), write the program you find in "bytes.txt" and execute it.
 
 **Important**: before executing the program, place yourself so that the top left corner of the screen is placed on the tile at 0,0. If you don't know what that means, just go to the exact spot shown in position.png after flying to Cerulean city.
 
