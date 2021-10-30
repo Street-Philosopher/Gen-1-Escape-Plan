@@ -21,8 +21,14 @@ namespace byteToPk1
 
             Console.WriteLine("Write the path to the folder your files will be saved in: ");
             args[0] = Console.ReadLine();
+            
+            Console.WriteLine("How many pokémons are you trying to decode?");
+            do
+                args[nOfBytes] = Console.ReadLine();
+            while (args[nOfBytes] == "");
+            
             Console.WriteLine("Now write the bytes of data from your code: ");
-            for (int i = 1; i < args.Length; i++)
+            for (int i = 1; i < args.Length - 1; i++)
             {
                 Console.WriteLine("\n" + i + ": ");
                 do
