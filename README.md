@@ -15,7 +15,9 @@ After executing the program, exit any menus you may be in: your GameBoy screen w
 After that, the code will have to be read for its data to be decripted. I'm working on a way to do this automatically, but currently there isn't one yet. If you want to read it manually, follow these instructions exactly:
 1) The code has black and dark pixels: you should read the code by squares, 8 pixels by 8 pixels
 2) The first square is the top left, second is the one to its right and so on. Once you reach the end of the line, go back to the left and down one line
-3) Each square will be read in the following way: take the first row of pixels (the topmost line) and count all dark pixels as a 0, and all black pixels as a 1. Then, use a binary converter (like [this](https://www.mathsisfun.com/binary-decimal-hexadecimal-converter.html)) to convert this binary string to a number in decimal and write down the number you get. Write down all these numbers in order, and then write them in the correct order in the converter when asked to.
+3) Each square will be read in the following way: take the first row of pixels (the topmost line) and write down all dark pixels as a 0, and all black pixels as a 1. Then, use a binary converter (like [this](https://www.mathsisfun.com/binary-decimal-hexadecimal-converter.html)) to convert this binary string to a number in decimal and write down the number you get. Write down all these numbers in order, and then write them in the correct order in the converter when asked to.
+
+_Note_: to make things faster if you want to interpret manually, note that you don't have to transcribe all of the code. Instead, you only have to read (33 times the number of pokémons in your box) lines. for example, if you have only five pokémon you must read 33 * 5 = 165 lines, which means you should end in the 21st square.
 
 
 
