@@ -17,23 +17,30 @@ namespace byteToPk1
             //if there's a problem with the args then this will execute asking the user to fix them
             #region Args Checking
             if (args.Length != nOfBytes + 1)
+            {
                 args = new string[nOfBytes + 1];
 
-            Console.WriteLine("Write the path to the folder your files will be saved in: ");
-            args[0] = Console.ReadLine();
-            
-            Console.WriteLine("How many pokémons are you trying to decode?");
-            do
-                args[nOfBytes] = Console.ReadLine();
-            while (args[nOfBytes] == "");
-            
-            Console.WriteLine("Now write the bytes of data from your code: ");
-            for (int i = 1; i < args.Length - 1; i++)
-            {
-                Console.WriteLine("\n" + i + ": ");
+                Console.WriteLine("Write the path to the folder your files will be saved in: ");
+                args[0] = Console.ReadLine();
+
+                byte monsToDecode;
+                Console.WriteLine("How many pokémons are you trying to decode?");
                 do
-                    args[i] = Console.ReadLine();
-                while (args[i] == "");
+                    args[nOfBytes] = Console.ReadLine();
+                while (!byte.TryParse(args[nOfBytes], out monsToDecode));
+                //if the string can't be interpreted as a byte, repeat
+
+                Console.WriteLine("Now write the bytes of data from your code: ");
+                for (int i = 1; i <= (monSize * monsToDecode); i++)
+                {
+                    Console.WriteLine("\n" + i + ": ");
+                    do
+                        args[i] = Console.ReadLine();
+                    while (!byte.TryParse(args[i], out byte emptyVar));
+                }
+                //set all remaining bytes to 0, except last one that we set earlier
+                for (int i = (monSize * monsToDecode) + 1; i < args.Length - 1; i++)
+                    args[i] = "0";
             }
             #endregion
 
@@ -81,7 +88,7 @@ namespace byteToPk1
                 #region Data Decoding
                 try//try to set species. if impossible then fuck you
                 {
-                    mon.Species = SpeciesConverter.GetG1Species((byte)(current[0] - 1));
+                    mon.Species = SpeciesConverter.GetG1Species(current[0]);
                 }
                 catch
                 {
@@ -97,7 +104,7 @@ namespace byteToPk1
                 mon.TID = (data[12] * 256) + data[13];
                 mon.EXP = ((uint)data[14] * 256 * 256) + ((uint)data[15] * 256) + data[16];
 
-                mon.EV_HP  = (data[17] * 256) + data[18];
+                mon.EV_HP = (data[17] * 256) + data[18];
                 mon.EV_ATK = (data[19] * 256) + data[20];
                 mon.EV_DEF = (data[21] * 256) + data[22];
                 mon.EV_SPE = (data[23] * 256) + data[24];
@@ -119,7 +126,7 @@ namespace byteToPk1
                 //a: it would require more tiles, and probably wouldn't be able to fit the code in one screen which would make it much harder to program in assembly
                 //b: it would be a nightmare to convert from rb bytes to strings because rb doesn't use ASCII encoding
                 Console.WriteLine("Succesfully decoded " + mon.Nickname + ". Do you want to nickname it? Leave blank for no nickname: ");
-            NNLoop:
+                NNLoop:
                 string nn = Console.ReadLine();
                 if (nn.Length == 0)  //user doesnt want nickname
                 {
@@ -137,7 +144,7 @@ namespace byteToPk1
                     mon.Nickname = nn;
                 }
 
-            OTLoop:
+                OTLoop:
                 Console.WriteLine("What's the OT name?");
                 string ot = Console.ReadLine();
                 if (ot.Length == 0 || ot.Length > 7)
@@ -158,7 +165,8 @@ namespace byteToPk1
                 {
                     //create file at correct path and write pkhex data to it
                     File.WriteAllBytes(path + "/" + mon.FileName, mon.DecryptedBoxData);
-                }catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Console.WriteLine("Couldn't decode pokémon number " + i + ": " + ex);
                 }
