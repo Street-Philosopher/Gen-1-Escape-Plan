@@ -52,9 +52,9 @@ namespace byteToPk1
 
             //last byte encodes the number of valid pokémon that have been read
             int monsToConvert = data[^1];
-            if (monsToConvert > maxMons)//can't happen, so if it does some data got corrupt
+            if (monsToConvert > maxMons)//can't happen, so if it does some data got misread
             {
-                Console.WriteLine("Possible corrupt data detected: more than 20 pokémon in box. Do you still want to decode your pokémon? ");
+                Console.WriteLine("Invalid data detected: more than 20 pokémon in box. The rest of the data could also be misread. Do you still want to decode your pokémon? ");
                 if (Console.ReadLine().ToLower()[0] != 'y')
                 {
                     Console.WriteLine("Please review your data and try again.");
@@ -64,7 +64,7 @@ namespace byteToPk1
             }
             if (monsToConvert == 0)
             {
-                Console.WriteLine("Possible corrupt data detected: no pokémon in box. Do you still want to decode your pokémon? ");
+                Console.WriteLine("Invalid data detected: no pokémon in box. The rest of the data could also be misread. Do you still want to decode your pokémon? ");
                 if (Console.ReadLine().ToLower()[0] != 'y')
                 {
                     Console.WriteLine("Please review your data and try again.");
