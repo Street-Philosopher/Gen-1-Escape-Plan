@@ -16,14 +16,15 @@ namespace byteToPk1
 
             //if there's a problem with the args then this will execute asking the user to fix them
             #region Args Checking
-            if (args.Length != nOfBytes + 1)
+            //if a bad number of arguments is detected, redo them. this way we can don't HAVE to execute it from window, but can just double click it
+            if (args.Length != nOfBytes + 1)  // +1 because args contains the path to save to
             {
                 args = new string[nOfBytes + 1];
 
-                Console.WriteLine("Write the path to the folder your files will be saved in: ");
+                Console.WriteLine("Write the path to the folder you want to save your files to: ");
                 args[0] = Console.ReadLine();
 
-                byte monsToDecode;
+                byte monsToDecode; //temp variable used to only ask bytes for this number of mons
                 Console.WriteLine("How many pokémons are you trying to decode?");
                 do
                     args[nOfBytes] = Console.ReadLine();
@@ -38,12 +39,12 @@ namespace byteToPk1
                         args[i] = Console.ReadLine();
                     while (!byte.TryParse(args[i], out byte emptyVar));
                 }
-                //set all remaining bytes to 0, except last one that we set earlier
-                for (int i = (monSize * monsToDecode) + 1; i < args.Length - 1; i++)
+                //set all bytes we didn't set already to avoid errors
+                for (int i = (monSize * monsToDecode) + 1; i < args.Length - 1; i++) //-1 because we did set the "number of pokémon" byte to zero
                     args[i] = "0";
             }
             #endregion
-
+                
             string path = args[0]; //first arg is path to save the files to
             byte[] data = new byte[nOfBytes];
             for (int i = 1; i <= data.Length; i++) //the rest is the bytes
