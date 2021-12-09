@@ -12,7 +12,7 @@ First step is to execute the ACE program. Find any setup that you like (i recomm
 
 **Important**: before executing the program, place yourself so that the top left corner of the screen is placed on the tile at 0,0. If you don't know what that means, just fly to some city, enter a building or anything else that causes an area reload (if your character moves after the area loads, for example when you come out of a door, it doesn't work).
 
-After executing the program, exit any menus you may be in: your GameBoy screen will show a code (check [exampleCode.jpg](https://github.com/AlphaL64/MonConverter/blob/17fbb9a72bf62a9d129777bb3241eefe029b9b0d/images/exampleCode.jpg) to see what it should look like). Take a picture with your phone (I'd reccomend you take more than one, just in case).
+After executing the program, exit any menus you may be in: your GameBoy screen will show a code. Take a picture with your phone (I'd reccomend you take more than one, just in case).
 
 After that, the code will have to be read for its data to be decripted. I'm working on a way to do this automatically, but currently there isn't one yet. If you want to read it manually, follow these instructions exactly:
 1) The code has black and dark pixels: you should read the code by squares, 8 pixels by 8 pixels
