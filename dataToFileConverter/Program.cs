@@ -17,7 +17,7 @@ namespace byteToPk1
             //if there's a problem with the args then this will execute asking the user to fix them
             #region Args Checking
             //if a bad number of arguments is detected, redo them. this way we can don't HAVE to execute it from window, but can just double click it
-            if (args.Length != nOfBytes + 1)  // +1 because args contains the path to save to
+            if (args.Length != nOfBytes + 1)  // +1 because args also contain the path to save to
             {
                 args = new string[nOfBytes + 1];
 
