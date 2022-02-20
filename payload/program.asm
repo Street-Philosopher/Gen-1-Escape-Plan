@@ -135,8 +135,57 @@ end_fs:
 	
 
 ; probably can be optimised if I put it after the rest of the data, but it's fine for now
+; ; overwrites white and black tiles to be actually white or black
+; 	ld hl,$9540			; writes to the black tile
+; 	ld a,$ff
+; overwrite_5455:
+; 	ld b,$10
+; loop1:							; write 16 times ff to create black tile, then adds one to write 00, which creates white tile. this way i don't have to rewrite the function
+; 	ldi (hl),a
+; 	dec b
+; 	jr nz,loop1			; write all 16 bytes as a sprite is 16 bytes long
+	
+; 	; adds one, and jumps back to the start if there was an overflow. this way we only jump the first time (as "a" contains ff), AND we get the correct value for "a" to write
+; 	; O P T I M I S A T I O N S
+; 	add a,1					 ; we use "add 1" and not "inc" because "inc" does not set the overflow flag
+; 	jr c,overwrite_5455		 ; se posso, penso che sia una soluzione piuttosto intelligente
+
+; here "d" is used as a counter for the tiles we still have to overwrite
+; "bc" contains the VRAM address containing sprite data, the one we'll need to overwrite
+; "hl" contains the address containing box data
+; "e" is also used as a counter simply because otherwise the number to load in "d" would be too large. it counts the number of bytes in each tile (8)
+; this overwrites the tile data with our data
+overwriteStuff:
+	ld d,$53				; we do this for 0x53 (84, since we count 0) tiles
+	ld hl,$9000			; that's where VRAM for tiles starts
+	ld bc,BOX_DATA
+overwriteStuffLoop2:
+	ld e,8 			; every tile has 8 bytes
+overwriteStuffLoop:
+	ld a,(bc)
+	inc bc
+	ldi (hl),a
+	ld a,$ff				; i found out by writing any byte and then "ff" a black-on-white binary representation of that byte will be shown on the sprite
+	ldi (hl),a			; write ff to VRAM and increase
+	dec e
+	jr nz,overwriteStuffLoop 	; will loop for all bytes in the tile
+	dec d
+	jr nz,overwriteStuffLoop2	; will loop for every tile in the code
+
+; last twelve bytes are useless except the last one which contains the number of valid pokémon in the box, this way we don't decode invalid data
+writeMonNumber:
+	ld bc, $da79 ; starts 7 bytes before the "number of pokémon in box" byte, this way it gets written as the last one
+	ld e,8
+wmnLoop:
+	ld a,(bc)
+	inc bc
+	ldi (hl),a
+	ld a,$ff
+	ldi (hl),a
+	dec e
+	jr nz, wmnLoop
+
 ; overwrites white and black tiles to be actually white or black
-	ld hl,$9540			; writes to the black tile
 	ld a,$ff
 overwrite_5455:
 	ld b,$10
@@ -150,42 +199,6 @@ loop1:							; write 16 times ff to create black tile, then adds one to write 00
 	add a,1					 ; we use "add 1" and not "inc" because "inc" does not set the overflow flag
 	jr c,overwrite_5455		 ; se posso, penso che sia una soluzione piuttosto intelligente
 
-; here "d" is used as a counter for the tiles we still have to overwrite
-; "bc" contains the VRAM address containing sprite data, the one we'll need to overwrite
-; "hl" contains the address containing box data
-; "e" is also used as a counter simply because otherwise the number to load in "d" would be too large. it counts the number of bytes in each tile (8)
-; this overwrites the tile data with our data
-overwriteStuff:
-	ld d,$53				; we do this for 0x53 (84, since we count 0) tiles
-	ld bc,$9000			; that's where VRAM for tiles starts
-	ld hl,BOX_DATA
-overwriteStuffLoop2:
-	ld e,8 			; every tile has 8 bytes
-overwriteStuffLoop:
-	ldi a,(hl)			; write our byte and increase the pointer to go to the next one
-	ld (bc),a			; load the data in VRAM
-	inc bc			; increase VRAM pointer
-	ld a,$ff				; i found out by writing any byte and then "ff" a black-on-white binary representation of that byte will be shown on the sprite
-	ld (bc),a			; write ff to VRAM and increase
-	inc bc
-	dec e
-	jr nz,overwriteStuffLoop 	; will loop for all bytes in the tile
-	dec d
-	jr nz,overwriteStuffLoop2	; will loop for every tile in the code
-
-; last twelve bytes are useless except the last one which contains the number of valid pokémon in the box, this way we don't decode invalid data
-writeMonNumber:
-	ld hl, $da79 ; starts 7 bytes before the "number of pokémon in box" byte, this way it gets written as the last one
-	ld e,8
-wmnLoop:
-	ldi a,(hl)
-	ld (bc),a
-	inc bc
-	ld a,$ff
-	ld (bc),a
-	inc bc
-	dec e
-	jr nz, wmnLoop
 ; END OF OVERWRITE 
 
 	; turn the screen back on but keep sprites disabled
