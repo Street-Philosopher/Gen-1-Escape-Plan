@@ -1,7 +1,0 @@
-C:\Users\Craft\source\repos\byteToPk1\byteToPk1\bin\Release\byteToPk1.pdb
-C:\Users\Craft\source\repos\byteToPk1\byteToPk1\bin\Release\clrcompression.dll
-C:\Users\Craft\source\repos\byteToPk1\byteToPk1\bin\Release\clrjit.dll
-C:\Users\Craft\source\repos\byteToPk1\byteToPk1\bin\Release\coreclr.dll
-C:\Users\Craft\source\repos\byteToPk1\byteToPk1\bin\Release\mscordaccore.dll
-C:\Users\Craft\source\repos\byteToPk1\byteToPk1\bin\Release\PKHeX.Core.dll.config
-C:\Users\Craft\source\repos\byteToPk1\byteToPk1\bin\Release\byteToPk1.exe
