@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "iVxgWTKFDAVFCPtxoOo7JGNR2zL9vauuXJUhGoEPa8gRTgYdpp4OwHP4ujf8gQYVMwv1u5J1TqicvHydyuer7g==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Craft\\source\\repos\\byteToPk1\\byteToPk1\\byteToPk1.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Craft\\.nuget\\packages\\ilmerge\\3.0.41\\ilmerge.3.0.41.nupkg.sha512"
+  ],
+  "logs": []
+}
