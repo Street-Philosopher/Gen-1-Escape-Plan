@@ -4,7 +4,7 @@ using PKHeX.Core;
 
 namespace byteToPk1
 {
-    class Program
+    class converter
     {
         //last 12 bytes are useless, except last one that contains the number of nums to decode
         static void Main(string[] args)
@@ -22,22 +22,23 @@ namespace byteToPk1
                 args = new string[nOfBytes + 1];
 
                 Console.WriteLine("Write the path to the folder you want to save your files to: ");
-                args[0] = Console.ReadLine()!;
+                args[0] = Console.ReadLine();
 
                 byte monsToDecode; //temp variable used to only ask bytes for this number of mons
                 Console.WriteLine("How many pokémons are you trying to decode?");
                 do
-                    args[nOfBytes] = Console.ReadLine()!;
+                    args[nOfBytes] = Console.ReadLine();
                 while (!byte.TryParse(args[nOfBytes], out monsToDecode));
                 //if the string can't be interpreted as a byte, repeat
 
+                byte emptyVar;
                 Console.WriteLine("Now write the bytes of data from your code: ");
                 for (int i = 1; i <= (monSize * monsToDecode); i++)
                 {
                     Console.WriteLine("\n" + i + ": ");
                     do
-                        args[i] = Console.ReadLine()!;
-                    while (!byte.TryParse(args[i], out byte emptyVar));
+                        args[i] = Console.ReadLine();
+                    while (!byte.TryParse(args[i], out emptyVar));
                 }
                 //set all bytes we didn't set already to avoid errors
                 for (int i = (monSize * monsToDecode) + 1; i < args.Length - 1; i++) //-1 because we did set the "number of pokémon" byte to zero
@@ -51,11 +52,11 @@ namespace byteToPk1
                 data[i - 1] = byte.Parse(args[i]);
 
             //last byte encodes the number of valid pokémon that have been read
-            int monsToConvert = data[^1];
+            int monsToConvert = data[data.Length - 1];
             if (monsToConvert > maxMons)//can't happen, so if it does some data got misread
             {
                 Console.WriteLine("Invalid data detected: more than 20 pokémon in box. The rest of the data could also be misread. Do you still want to decode your pokémon? ");
-                if (Console.ReadLine()!.ToLower()[0] != 'y')
+                if (Console.ReadLine().ToLower()[0] != 'y')
                 {
                     Console.WriteLine("Please review your data and try again.");
                     return;
@@ -65,7 +66,7 @@ namespace byteToPk1
             if (monsToConvert == 0)
             {
                 Console.WriteLine("Invalid data detected: no pokémon in box. The rest of the data could also be misread. Do you still want to decode your pokémon? ");
-                if (Console.ReadLine()!.ToLower()[0] != 'y')
+                if (Console.ReadLine().ToLower()[0] != 'y')
                 {
                     Console.WriteLine("Please review your data and try again.");
                     return;
@@ -128,7 +129,7 @@ namespace byteToPk1
                 //b: it would be a nightmare to convert from rb bytes to strings because rb doesn't use ASCII encoding
                 Console.WriteLine("Succesfully decoded " + mon.Nickname + ". Do you want to nickname it? Leave blank for no nickname: ");
                 NNLoop:
-                string nn = Console.ReadLine()!;
+                string nn = Console.ReadLine();
                 if (nn.Length == 0)  //user doesnt want nickname
                 {
                     mon.ClearNickname();
@@ -147,7 +148,7 @@ namespace byteToPk1
 
                 OTLoop:
                 Console.WriteLine("What's the OT name?");
-                string ot = Console.ReadLine()!;
+                string ot = Console.ReadLine();
                 if (ot.Length == 0 || ot.Length > 7)
                 {
                     Console.WriteLine("Invalid OT. Please retry");

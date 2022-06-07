@@ -1,11 +1,11 @@
+import os
+
 VASM_PATH = "vasmz80_oldstyle_win32.exe"
 TEMPFILE_NAME = "temp.bin"
-BUILT_NAME = "payload/bytes.txt"
+BUILT_NAME = "build/bytes.txt"
 ASM_PATH = "payload/program.asm"
 
 try:
-	import os
-
 	def ByteToHex(byte):
 		pass
 
@@ -31,4 +31,7 @@ try:
 except Exception as e:
 	print("error while building:\n" + str(e))
 
-input()
+#don't ask for input, if this is called from build_all it will have a parameter
+import sys
+if len(sys.argv) == 1:
+	input()
