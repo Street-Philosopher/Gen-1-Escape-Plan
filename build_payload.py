@@ -1,6 +1,7 @@
 import os
 
 VASM_PATH = "vasmz80_oldstyle_win32.exe"
+VASM_ARGS = "-gbz80 -nocase -chklabels -dotdir -Fbin"
 TEMPFILE_NAME = "temp.bin"
 BUILT_NAME = "build/bytes.txt"
 ASM_PATH = "payload/program.asm"
@@ -10,7 +11,7 @@ try:
 		pass
 
 	print("assembling...")
-	os.system(f'{VASM_PATH} -gbz80 -nocase -chklabels -dotdir -Fbin -o "{TEMPFILE_NAME}" "{ASM_PATH}"')
+	os.system(f'{VASM_PATH} {VASM_ARGS} -o "{TEMPFILE_NAME}" "{ASM_PATH}"')
 
 	print()
 	print("writing the bytes.txt file...")

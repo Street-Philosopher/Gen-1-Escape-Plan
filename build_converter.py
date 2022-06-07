@@ -1,16 +1,14 @@
 import os
-#TODO: add PKHeX import
 
 #wtf is this lmao
 # from sqlite3 import ProgrammingError
 
-PROGRAM_PATH = f"converter\converter.cs"
+DEPENDENCIES_PATH = "converter\dependencies"
+SCRIPT_PATH = f"converter\converter.cs"
 BUILD_PATH = "build/converter.exe"
 
 try:
-	os.system(f'csc /r:"converter\dependencies\PKHeX.Core.dll" /r:"converter\dependencies\\netstandard.dll" /out:{BUILD_PATH} {PROGRAM_PATH}')
-	# if os.path.isfile(BUILD_PATH):
-	# 	os.remove(BUILD_PATH)
+	os.system(f'csc /r:"{DEPENDENCIES_PATH}\PKHeX.Core.dll" /r:"{DEPENDENCIES_PATH}\\netstandard.dll" /out:{BUILD_PATH} {SCRIPT_PATH}')
 	print("done!")
 except Exception as e:
 	print("error while building:\n" + str(e))
