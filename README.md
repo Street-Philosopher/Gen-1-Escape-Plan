@@ -25,5 +25,10 @@ When you have all the numbers in place, you can download the decoder and pass in
 
 
 
+# Building
+There are two .py files in the root directory, and running those will give you the build. There are a couple of requirements, however: you should have csc.exe (the C# compiler) in your PATH, and vasmz80_oldstyle_win32.exe (the assembler I use for gbz80 Assembly) in the same folder as the .py scripts. Finally, to build the C# app you'll need PKHeX.Core.dll and netstandard.dll.
+
+
+
 # To Do
 I'm working on a way to automatically read the printed code and interpret its data, but it's probably going to take a while because I have no idea of what I'm doing.
