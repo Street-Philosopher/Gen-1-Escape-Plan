@@ -18,7 +18,7 @@ VBlankCheck:
 	ldh ($40),a
 	; now the screen is off and we can do stuff
 
-	ld a,0
+	xor a,a				; equal to "ld a,0"
 	ldh ($d7),a			; block tile animations by loading 0 in $ffd7. otherwise tiles like flowers would constantly change, breaking our image
 ; end of prep
 
@@ -56,7 +56,7 @@ fs_loop2:
 	dec b
 	jr nz,fs_loop2
 
-	ld a,0		; initialise a to 0, this is where the tiling starts
+	xor a,a		; initialise a to 0, this is where the tiling starts
 	ld d,8		; number of lines in the code
 dataLoop:	; repeated for each line
 	ld b,20
@@ -131,24 +131,7 @@ final_loop:
 	jr nz,final_loop
 end_fs:
 ;END OF FILLSCREEN
-	
-	
 
-; probably can be optimised if I put it after the rest of the data, but it's fine for now
-; ; overwrites white and black tiles to be actually white or black
-; 	ld hl,$9540			; writes to the black tile
-; 	ld a,$ff
-; overwrite_5455:
-; 	ld b,$10
-; loop1:							; write 16 times ff to create black tile, then adds one to write 00, which creates white tile. this way i don't have to rewrite the function
-; 	ldi (hl),a
-; 	dec b
-; 	jr nz,loop1			; write all 16 bytes as a sprite is 16 bytes long
-	
-; 	; adds one, and jumps back to the start if there was an overflow. this way we only jump the first time (as "a" contains ff), AND we get the correct value for "a" to write
-; 	; O P T I M I S A T I O N S
-; 	add a,1					 ; we use "add 1" and not "inc" because "inc" does not set the overflow flag
-; 	jr c,overwrite_5455		 ; se posso, penso che sia una soluzione piuttosto intelligente
 
 ; here "d" is used as a counter for the tiles we still have to overwrite
 ; "bc" contains the VRAM address containing sprite data, the one we'll need to overwrite
@@ -197,7 +180,7 @@ loop1:							; write 16 times ff to create black tile, then adds one to write 00
 	; adds one, and jumps back to the start if there was an overflow. this way we only jump the first time (as "a" contains ff), AND we get the correct value for "a" to write
 	; O P T I M I S A T I O N S
 	add a,1						; we use "add 1" and not "inc" because "inc" does not set the overflow flag
-	jr c,overwrite_5455			; honestly i think this is pretty smart
+	jr c,overwrite_5455			; tbh this is pretty smart
 
 ; END OF OVERWRITE 
 

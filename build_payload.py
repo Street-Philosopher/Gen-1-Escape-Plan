@@ -7,9 +7,6 @@ BUILT_NAME = "build/bytes.txt"
 ASM_PATH = "payload/program.asm"
 
 try:
-	def ByteToHex(byte):
-		pass
-
 	print("assembling...")
 	os.system(f'{VASM_PATH} {VASM_ARGS} -o "{TEMPFILE_NAME}" "{ASM_PATH}"')
 
