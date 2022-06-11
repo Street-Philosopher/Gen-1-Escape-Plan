@@ -25,6 +25,9 @@ VBlankCheck:
 	ld a,$63			; turn off the screen
 	ldh ($40),a
 	; now the screen is off and we can do stuff
+	
+	xor a,a		; initialise a to 0, this is where the tiling starts
+	ldh ($d7),a			; block tile animations by loading 0 in $ffd7. otherwise tiles like flowers would constantly change, breaking our image
 ; end of prep
 
 ; this will overwrite the current map data to show on screen a frame (black and white) containing all different tiles
@@ -62,15 +65,11 @@ fs_loop2:
 	dec c
 	jr nz,fs_loop2
 
-	; TODO: see if you can tie the "ld A,WHITE_FRAME" above to down here to save something
-	xor a,a		; initialise a to 0, this is where the tiling starts
-		; doing this here allows to save an extra byte, since we only do "xor A,A" once
-		ldh ($d7),a			; block tile animations by loading 0 in $ffd7. otherwise tiles like flowers would constantly change, breaking our image
 	ld d,8		; number of lines in the code
 	; "ld C,0" not necessary because C is already zero
 dataLoop:	; repeated for each line
 	ld b,20
-	ld A,BLACK_SQUARE
+	dec A		; does "ld A,BLACK_SQUARE"
 fs_loop3:						; new line, by writing black squares until we're in the right position
 	ldi (hl),a
 	dec b
