@@ -14,7 +14,7 @@ MAP_DATA  = $9800
 BOX_DATA  = $DA96
 MON_NUMBER= $DA80
 
-;TODO: is vblankcheck really necessary? do some research abt it
+;TODO: are vblankcheck and interrupts really necessary? do some research
 
 ; preparation before changing stuff
 	di
@@ -65,30 +65,31 @@ fs_loop2:
 	dec c
 	jr nz,fs_loop2
 
-	ld d,8		; number of lines in the code
+	ld b,8		; number of lines in the code
 	; "ld C,0" not necessary because C is already zero
 dataLoop:	; repeated for each line
-	ld b,20
+	ld de,$140A
+	; ld d,20
+	; ld e,10
 	dec A		; does "ld A,BLACK_SQUARE"
 fs_loop3:						; new line, by writing black squares until we're in the right position
 	ldi (hl),a
-	dec b
+	dec d
 	jr nz,fs_loop3
 	inc A		; ld A,WHITE_FRAME
 	ldi (hl),a			; white tile for frame
 
 	; for 10 data tiles in the line
-	ld b,10
 fs_loop4:
 	ld (hl),c
 	inc hl
 	inc c							; next tile
-	dec b							; decrease line tile counter
+	dec e							; decrease line tile counter
 	jr nz,fs_loop4
 	
 	ldi (hl),a			; one white tile for right frame
 
-	dec d
+	dec b
 	jr nz,dataLoop
 
 	dec A
@@ -112,7 +113,7 @@ fs_loop6:
 	inc a
 	ldi (hl),a
 	ld a,WHITE_FRAME
-	ld bc,$0714		; load 7 in B and 20 in C, this way we save a load later
+	ld bc,$0714		; load 7 in B and 20 in C, by pairing two registers we save a load
 	; ld B,7
 	; ld C,20
 fs_loop7:						; since we only have 4 data tiles, we fill the other 6 tiles in the line with white frame tiles
@@ -121,7 +122,7 @@ fs_loop7:						; since we only have 4 data tiles, we fill the other 6 tiles in t
 	jr nz,fs_loop7
 
 	; last new line
-	ld a,BLACK_SQUARE
+	dec A		; ld a,BLACK_SQUARE
 fs_loop8:
 	ldi (hl),a
 	dec c
@@ -131,13 +132,13 @@ fs_loop8:
 	ld bc,$0C84
 	; ld B,12
 	; ld C,$84
-	ld a,WHITE_FRAME
+	inc A; ld a,WHITE_FRAME
 fs_loop69:
 	ldi (hl),a
 	dec b
 	jr nz,fs_loop69
 	; after the white frame, we cover the rest of the screen with black tiles
-	ld a,BLACK_SQUARE
+	dec A;ld a,BLACK_SQUARE
 final_loop:
 	ldi (hl),a
 	dec c
@@ -161,7 +162,7 @@ overwriteStuffLoop:
 	ld a,(bc)
 	inc bc
 	ldi (hl),a
-	ld a,$ff				; i found out by writing any byte and then "ff" a black-on-white binary representation of that byte will be shown on the sprite
+	ld a,$FF				; i found out by writing any byte and then "ff" a black-on-white binary representation of that byte will be shown on the sprite
 	ldi (hl),a			; write ff to VRAM and increase
 	dec e
 	jr nz,overwriteStuffLoop	; will loop for all bytes in the tile
@@ -171,7 +172,9 @@ overwriteStuffLoop:
 
 	; an entire column will be just for the number. this saves three bytes
 	writeMonNumber:
-	ld b,8
+	ld bc,$0810
+	; ld b,8
+	; ld c,$10
 	wmn_black_loop:
 	ld a,(MON_NUMBER)
 	ldi (hl),a
@@ -184,10 +187,10 @@ overwriteStuffLoop:
 ; overwrites white and black tiles to be actually white or black
 	; ld a,$ff is not needed because we loaded above
 overwrite_5455:
-	ld b,$10
+	; ld C,$10 is done with the paired loop
 loop1:							; write 16 times ff to create black tile, then adds one to write 00, which creates white tile. this way i don't have to rewrite the function
 	ldi (hl),a
-	dec b
+	dec c
 	jr nz,loop1			; write all 16 bytes as a sprite is 16 bytes long
 	
 	; adds one, and jumps back to the start if there was an overflow. this way we only jump the first time (as "a" contains ff), AND we get the correct value for "a" to write

@@ -10,4 +10,4 @@ print("building the payload...")
 os.system("build_payload.py no")
 # import build_payload
 
-input()
+os.system("/bin/bash -c 'read -s -n 1 -p \"Press any key to continue...\"'" if os.name == "posix" else "pause")
