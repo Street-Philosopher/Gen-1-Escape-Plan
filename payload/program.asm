@@ -1,8 +1,6 @@
 ; TODO: this could be maybe potentially be optimised by removing all the 0xFF when writing to VRAM which would also double the information density, which would require a rewrite of the program
 ; i don't know if you can notice the slow realisation that the idea is not that easy after all, in the comment above
 
-; TODO: maybe some push and pop magic can save some more bytes
-
 ; first box
 ; (33*20) + 1 bytes of information
 
@@ -27,9 +25,6 @@ VBlankCheck:
 	ld a,$63			; turn off the screen
 	ldh ($40),a
 	; now the screen is off and we can do stuff
-
-	xor a,a				; equal to "ld a,0"
-	ldh ($d7),a			; block tile animations by loading 0 in $ffd7. otherwise tiles like flowers would constantly change, breaking our image
 ; end of prep
 
 ; this will overwrite the current map data to show on screen a frame (black and white) containing all different tiles
@@ -61,18 +56,20 @@ fs_loop1:				; start by adding black squares to make the frame
 	dec b
 	jr nz,fs_loop1
 	; draws top line of frame
-	ld a,WHITE_FRAME
+	inc A ; equivalent to "ld a,WHITE_FRAME", bc WHITE_FRAME is BLACK_SQUARE + 1
 fs_loop2:
 	ldi (hl),a
 	dec c
 	jr nz,fs_loop2
 
 	xor a,a		; initialise a to 0, this is where the tiling starts
+		; doing this here allows to save an extra byte, since we only do "xor A,A" once
+		ldh ($d7),a			; block tile animations by loading 0 in $ffd7. otherwise tiles like flowers would constantly change, breaking our image
 	ld d,8		; number of lines in the code
 dataLoop:	; repeated for each line
 	ld b,20
 fs_loop3:						; new line, by writing black squares until we're in the right position
-	ld (hl),BLACK_SQUARE
+	ld (hl),BLACK_SQUARE	; TODO: this can probably be made not bad
 	inc hl
 	dec b
 	jr nz,fs_loop3
