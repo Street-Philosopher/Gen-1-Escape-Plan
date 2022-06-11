@@ -62,44 +62,48 @@ fs_loop2:
 	dec c
 	jr nz,fs_loop2
 
+	; TODO: see if you can tie the "ld A,WHITE_FRAME" above to down here to save something
 	xor a,a		; initialise a to 0, this is where the tiling starts
 		; doing this here allows to save an extra byte, since we only do "xor A,A" once
 		ldh ($d7),a			; block tile animations by loading 0 in $ffd7. otherwise tiles like flowers would constantly change, breaking our image
 	ld d,8		; number of lines in the code
+	; "ld C,0" not necessary because C is already zero
 dataLoop:	; repeated for each line
 	ld b,20
+	ld A,BLACK_SQUARE
 fs_loop3:						; new line, by writing black squares until we're in the right position
-	ld (hl),BLACK_SQUARE	; TODO: this can probably be made not bad
-	inc hl
+	ldi (hl),a
 	dec b
 	jr nz,fs_loop3
-	ld (hl),WHITE_FRAME			; white tile for frame
-	inc hl
+	inc A		; ld A,WHITE_FRAME
+	ldi (hl),a			; white tile for frame
 
 	; for 10 data tiles in the line
 	ld b,10
 fs_loop4:
-	ldi (hl),a
-	inc a							; next tile
+	ld (hl),c
+	inc hl
+	inc c							; next tile
 	dec b							; decrease line tile counter
 	jr nz,fs_loop4
 	
-	ld (hl),WHITE_FRAME			; one white tile for right frame
-	inc hl
+	ldi (hl),a			; one white tile for right frame
 
 	dec d
 	jr nz,dataLoop
 
+	dec A
 	; the last line is different, having only 4 tiles we need to show. for this reason it has a separate part of the function
 	ld b,20
 fs_loop6:
-	ld (hl),BLACK_SQUARE
-	inc hl						; new line
+	ldi (hl),a
 	dec b
 	jr nz,fs_loop6
 
-	ld (hl),WHITE_FRAME
-	inc hl
+	inc a
+	ldi (hl),a
+
+	ld a,c
 
 	ldi (hl),a
 	inc a
