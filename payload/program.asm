@@ -26,13 +26,14 @@ VBlankCheck:
 	ldh ($40),a
 	; now the screen is off and we can do stuff
 	
-	xor a,a		; initialise a to 0, this is where the tiling starts
+	xor a,a
 	ldh ($d7),a			; block tile animations by loading 0 in $ffd7. otherwise tiles like flowers would constantly change, breaking our image
 ; end of prep
 
 ; this will overwrite the current map data to show on screen a frame (black and white) containing all different tiles
 ; "hl" will hold the VRAM address containing current tile data, so we can overwrite the map at our likings
-; "a" is the tile number we want to write next
+; "c" is the tile number we want to write next
+; "a" contains either the white frame or the black square tile numbers
 ; "b" and "d" are used as counters
 ;
 ; drawing (W means white, D means data):
@@ -67,6 +68,7 @@ fs_loop2:
 
 	ld b,8		; number of lines in the code
 	; "ld C,0" not necessary because C is already zero
+	; C will contain the current tile, so it will get increased whenever we need to place a new one
 dataLoop:	; repeated for each line
 	ld de,$140A
 	; ld d,20
