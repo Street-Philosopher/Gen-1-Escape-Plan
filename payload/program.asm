@@ -1,3 +1,6 @@
+; TODO: this could be maybe potentially be optimised by removing all the 0xFF when writing to VRAM which would also double the information density, which would require a rewrite of the program
+; i don't know if you can notice the slow realisation that the idea is not that easy after all, in the comment above
+
 ; first box
 ; (33*20) + 1 bytes of information
 
@@ -5,8 +8,11 @@
 BLACK_SQUARE = $54
 WHITE_FRAME	= $55
 
-; memory address for stored pokémon data
-BOX_DATA = $da96
+; memory addresses
+TILE_DATA = $9000
+MAP_DATA  = $9800
+BOX_DATA  = $DA96
+MON_NUMBER= $DA80
 
 ; preparation before changing stuff
 	di
@@ -41,7 +47,7 @@ VBlankCheck:
 ;	WWWWWWWWWWWW
 ;
 fillScreen:
-	ld hl,$9800
+	ld hl,MAP_DATA
 	ld b,$64			; to make the code centered in the screen, and to compensate for off-screen tiles
 	ld a,BLACK_SQUARE
 fs_loop1:				; start by adding black squares to make the frame
@@ -134,13 +140,13 @@ end_fs:
 
 
 ; here "d" is used as a counter for the tiles we still have to overwrite
-; "bc" contains the VRAM address containing sprite data, the one we'll need to overwrite
-; "hl" contains the address containing box data
+; "hl" contains the VRAM address containing sprite data, the one we'll need to overwrite
+; "bc" contains the address containing box data
 ; "e" is also used as a counter simply because otherwise the number to load in "d" would be too large. it counts the number of bytes in each tile (8)
 ; this overwrites the tile data with our data
 overwriteStuff:
 	ld d,$53				; we do this for 0x53 (84, since we count 0) tiles
-	ld hl,$9000				; that's where VRAM for tiles starts
+	ld hl,TILE_DATA
 	ld bc,BOX_DATA
 overwriteStuffLoop2:
 	ld e,8			; every tile has 8 bytes
@@ -154,22 +160,27 @@ overwriteStuffLoop:
 	jr nz,overwriteStuffLoop	; will loop for all bytes in the tile
 	dec d
 	jr nz,overwriteStuffLoop2	; will loop for every tile in the code
+	
 
-; last twelve bytes are useless except the last one which contains the number of valid pokémon in the box, this way we don't decode invalid data
-writeMonNumber:
-	ld bc, $da79	; starts 7 bytes before the "number of pokémon in box" byte, this way it gets written as the last one
-	ld e,8
-wmnLoop:
-	ld a,(bc)
-	inc bc
+	; this code sucks but i accidentally saved one byte so i'm not complaining
+	writeMonNumber:
+	ld b,14
+	ld a,$FF
+	wmn_black_loop:
+	ldi (hl),a
+	dec b
+	jr nz,wmn_black_loop
+	;first write 14 black bytes, for those 7 lines
+
+	; then write the mon number at the end
+	ld a,(MON_NUMBER)
 	ldi (hl),a
 	ld a,$ff
 	ldi (hl),a
-	dec e
-	jr nz, wmnLoop
+
 
 ; overwrites white and black tiles to be actually white or black
-	ld a,$ff
+	; ld a,$ff is not needed because we loaded above
 overwrite_5455:
 	ld b,$10
 loop1:							; write 16 times ff to create black tile, then adds one to write 00, which creates white tile. this way i don't have to rewrite the function
