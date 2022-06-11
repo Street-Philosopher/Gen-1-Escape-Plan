@@ -107,33 +107,33 @@ fs_loop6:
 	inc a
 	ldi (hl),a
 	ld a,WHITE_FRAME
-	ld b,7
+	ld bc,$0714		; load 7 in B and 20 in C, this way we save a load later
 fs_loop7:						; since we only have 4 data tiles, we fill the other 6 tiles in the line with white frame tiles
 	ldi (hl),a
 	dec b
 	jr nz,fs_loop7
 
 	; last new line
-	ld b,20
+	; ld b,20
 	ld a,BLACK_SQUARE
 fs_loop8:
 	ldi (hl),a
-	dec b
+	dec c
 	jr nz,fs_loop8
 	
 	; bottom row of the frame
-	ld b,12
+	ld bc,$0C84		; load 0x0C (12) in B and 0x84 in C
 	ld a,WHITE_FRAME
 fs_loop69:
 	ldi (hl),a
 	dec b
 	jr nz,fs_loop69
 	; after the white frame, we cover the rest of the screen with black tiles
-	ld b,$84
+	; ld b,$84, we loaded
 	ld a,BLACK_SQUARE
 final_loop:
 	ldi (hl),a
-	dec b
+	dec c
 	jr nz,final_loop
 end_fs:
 ;END OF FILLSCREEN
