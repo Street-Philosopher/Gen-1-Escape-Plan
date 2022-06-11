@@ -168,21 +168,16 @@ overwriteStuffLoop:
 	jr nz,overwriteStuffLoop2	; will loop for every tile in the code
 	
 
-	; this code sucks but i accidentally saved one byte so i'm not complaining
+	; an entire column will be just for the number. this saves three bytes
 	writeMonNumber:
-	ld b,14
-	ld a,$FF
+	ld b,8
 	wmn_black_loop:
-	ldi (hl),a
-	dec b
-	jr nz,wmn_black_loop
-	;first write 14 black bytes, for those 7 lines
-
-	; then write the mon number at the end
 	ld a,(MON_NUMBER)
 	ldi (hl),a
 	ld a,$ff
 	ldi (hl),a
+	dec b
+	jr nz,wmn_black_loop
 
 
 ; overwrites white and black tiles to be actually white or black
