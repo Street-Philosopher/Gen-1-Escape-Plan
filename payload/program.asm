@@ -1,7 +1,7 @@
 ; TODO: this could be maybe potentially be optimised by removing all the 0xFF when writing to VRAM which would also double the information density, which would require a rewrite of the program
 ; i don't know if you can notice the slow realisation that the idea is not that easy after all, in the comment above
 
-; TODO: more load optimisations
+; TODO: maybe some push and pop magic can save some more bytes
 
 ; first box
 ; (33*20) + 1 bytes of information
@@ -15,6 +15,8 @@ TILE_DATA = $9000
 MAP_DATA  = $9800
 BOX_DATA  = $DA96
 MON_NUMBER= $DA80
+
+;TODO: is vblankcheck really necessary? do some research abt it
 
 ; preparation before changing stuff
 	di
@@ -50,9 +52,9 @@ VBlankCheck:
 ;
 fillScreen:
 	ld hl,MAP_DATA
+	ld bc,$640C
 	; ld b,$64			; to make the code centered in the screen, and to compensate for off-screen tiles
 	; ld c,$0c
-	ld bc,$640C
 	ld a,BLACK_SQUARE
 fs_loop1:				; start by adding black squares to make the frame
 	ldi (hl),a
@@ -135,7 +137,6 @@ fs_loop69:
 	dec b
 	jr nz,fs_loop69
 	; after the white frame, we cover the rest of the screen with black tiles
-	; ld b,$84, we loaded
 	ld a,BLACK_SQUARE
 final_loop:
 	ldi (hl),a
@@ -190,7 +191,7 @@ loop1:							; write 16 times ff to create black tile, then adds one to write 00
 	jr nz,loop1			; write all 16 bytes as a sprite is 16 bytes long
 	
 	; adds one, and jumps back to the start if there was an overflow. this way we only jump the first time (as "a" contains ff), AND we get the correct value for "a" to write
-	; O P T I M I S A T I O N S
+	; O P T I M I S A T I O N S		;TODO: maybe this is not actually optimised, check to see
 	add a,1						; we use "add 1" and not "inc" because "inc" does not set the overflow flag
 	jr c,overwrite_5455			; tbh this is pretty smart
 
