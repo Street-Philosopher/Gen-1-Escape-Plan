@@ -1,6 +1,8 @@
 ; TODO: this could be maybe potentially be optimised by removing all the 0xFF when writing to VRAM which would also double the information density, which would require a rewrite of the program
 ; i don't know if you can notice the slow realisation that the idea is not that easy after all, in the comment above
 
+; TODO: more load optimisations
+
 ; first box
 ; (33*20) + 1 bytes of information
 
@@ -48,7 +50,9 @@ VBlankCheck:
 ;
 fillScreen:
 	ld hl,MAP_DATA
-	ld b,$64			; to make the code centered in the screen, and to compensate for off-screen tiles
+	; ld b,$64			; to make the code centered in the screen, and to compensate for off-screen tiles
+	; ld c,$0c
+	ld bc,$640C
 	ld a,BLACK_SQUARE
 fs_loop1:				; start by adding black squares to make the frame
 	ldi (hl),a
@@ -56,10 +60,9 @@ fs_loop1:				; start by adding black squares to make the frame
 	jr nz,fs_loop1
 	; draws top line of frame
 	ld a,WHITE_FRAME
-	ld b,$0c
 fs_loop2:
 	ldi (hl),a
-	dec b
+	dec c
 	jr nz,fs_loop2
 
 	xor a,a		; initialise a to 0, this is where the tiling starts
@@ -108,13 +111,14 @@ fs_loop6:
 	ldi (hl),a
 	ld a,WHITE_FRAME
 	ld bc,$0714		; load 7 in B and 20 in C, this way we save a load later
+	; ld B,7
+	; ld C,20
 fs_loop7:						; since we only have 4 data tiles, we fill the other 6 tiles in the line with white frame tiles
 	ldi (hl),a
 	dec b
 	jr nz,fs_loop7
 
 	; last new line
-	; ld b,20
 	ld a,BLACK_SQUARE
 fs_loop8:
 	ldi (hl),a
@@ -122,7 +126,9 @@ fs_loop8:
 	jr nz,fs_loop8
 	
 	; bottom row of the frame
-	ld bc,$0C84		; load 0x0C (12) in B and 0x84 in C
+	ld bc,$0C84
+	; ld B,12
+	; ld C,$84
 	ld a,WHITE_FRAME
 fs_loop69:
 	ldi (hl),a
