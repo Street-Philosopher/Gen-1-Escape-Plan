@@ -191,9 +191,9 @@ loop1:							; write 16 times ff to create black tile, then adds one to write 00
 	jr nz,loop1			; write all 16 bytes as a sprite is 16 bytes long
 	
 	; adds one, and jumps back to the start if there was an overflow. this way we only jump the first time (as "a" contains ff), AND we get the correct value for "a" to write
-	; O P T I M I S A T I O N S		;TODO: maybe this is not actually optimised, check to see
-	add a,1						; we use "add 1" and not "inc" because "inc" does not set the overflow flag
-	jr c,overwrite_5455			; tbh this is pretty smart
+	; O P T I M I S A T I O N S
+	inc a
+	jr z,overwrite_5455			; tbh this is pretty smart
 
 ; END OF OVERWRITE 
 
