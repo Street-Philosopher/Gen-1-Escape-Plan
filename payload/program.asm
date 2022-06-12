@@ -6,7 +6,7 @@
 
 ; index of the tile in memory used for black and white squares
 BLACK_SQUARE = $54
-WHITE_FRAME	= $55
+WHITE_SQUARE = $55
 
 ; memory addresses
 TILE_DATA = $9000
@@ -22,12 +22,11 @@ VBlankCheck:
 	ldh a,($44)	 	; vertical position of scanline
 	cp a, $91			; when it's $91 we just entered VBlank
 	jr nz,VBlankCheck
-	ld a,$63			; turn off the screen
-	ldh ($40),a
-	; now the screen is off and we can do stuff
-	
+
 	xor a,a
-	ldh ($d7),a			; block tile animations by loading 0 in $ffd7. otherwise tiles like flowers would constantly change, breaking our image
+	; what's important is that bit 7 is off (turns off the screen), we will set the other settings at the end anyways
+	ldh ($40),a			; LCD settings
+	ldh ($D7),a			; block tile animations by loading 0 in $ffd7. otherwise tiles like flowers would constantly change, breaking our image
 ; end of prep
 
 ; this will overwrite the current map data to show on screen a frame (black and white) containing all different tiles
@@ -60,7 +59,7 @@ fs_loop1:				; start by adding black squares to make the frame
 	dec b
 	jr nz,fs_loop1
 	; draws top line of frame
-	inc A ; equivalent to "ld a,WHITE_FRAME", bc WHITE_FRAME is BLACK_SQUARE + 1
+	inc A ; equivalent to "ld a,WHITE_SQUARE", bc WHITE_SQUARE is BLACK_SQUARE + 1
 fs_loop2:
 	ldi (hl),a
 	dec c
@@ -78,7 +77,7 @@ fs_loop3:						; new line, by writing black squares until we're in the right pos
 	ldi (hl),a
 	dec d
 	jr nz,fs_loop3
-	inc A		; ld A,WHITE_FRAME
+	inc A				; ld A,WHITE_SQUARE
 	ldi (hl),a			; white tile for frame
 
 	; for 10 data tiles in the line
@@ -94,7 +93,7 @@ fs_loop4:
 	dec b
 	jr nz,dataLoop
 
-	dec A
+	dec A				; ld A,BLACK_SQUARE
 	; the last line is different, having only 4 tiles we need to show. for this reason it has a separate part of the function
 	ld b,20
 fs_loop6:
@@ -114,7 +113,8 @@ fs_loop6:
 	ldi (hl),a
 	inc a
 	ldi (hl),a
-	ld a,WHITE_FRAME
+
+	ld a,WHITE_SQUARE
 	ld bc,$0714		; load 7 in B and 20 in C, by pairing two registers we save a load
 	; ld B,7
 	; ld C,20
@@ -134,7 +134,7 @@ fs_loop8:
 	ld bc,$0C84
 	; ld B,12
 	; ld C,$84
-	inc A; ld a,WHITE_FRAME
+	inc A; ld a,WHITE_SQUARE
 fs_loop69:
 	ldi (hl),a
 	dec b
