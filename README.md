@@ -1,9 +1,9 @@
-# MonConverter
-This is an arbitrary code execution program (ACE) for pokémon Red and Blue (english version) on the GameBoy.
+# Gen 1 Escape Plan
+As you'll know, the first two generations of Pokémon can't transfer to later generations. In addition, save files for those games run on batteries, which means that when those batteries run out the save files will be erased.
 
-When executed, it will read the data for the pokémon in your current box, and then write it to the screen by changing the tile data to the data read from the box.
+This repository contains an arbitrary code execution program (ACE) for pokémon Red and Blue (english version) that, when executed, will read the data for the pokémon in your current box, and then write it to the screen by changing the tile data to the data read from the box.
 
-I made this as a way to transfer pokémon from gen1, as you can't do it normally: there are many other ways of doing it, but usually they all require some external device to read your save file, and I didn't want to buy something that I would never use again after this. Instead, the idea behind this program is being able to do it with just your GameBoy, a smartphone, and some patience.
+I made this as a way to transfer pokémon from gen1: there are many other ways of doing it, but all the oness i could find require some external device to read your save file, and I didn't want to buy something that I would use only once. Instead, the idea behind this program is being able to do it with just your GameBoy, a smartphone, and some glitch magic.
 
 # Usage
 More detailed instructions can be found [here](https://docs.google.com/document/d/1CY9rRGymB8hse_mWoYx-IilI3dXrkb2gseOIo8w0cNw/edit?usp=sharing).
