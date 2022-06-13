@@ -59,7 +59,7 @@ fs_loop1:				; start by adding black squares to make the frame
 	dec B
 	jr nz,fs_loop1
 	; draws top line of frame
-	inc A ; equivalent to "ld A,WHITE_SQUARE", bc WHITE_SQUARE is BLACK_SQUARE + 1
+	inc A	; equivalent to "ld A,WHITE_SQUARE", bc WHITE_SQUARE is BLACK_SQUARE + 1
 fs_loop2:
 	ldi (HL),A
 	dec C
@@ -146,7 +146,6 @@ final_loop:
 	dec C
 	jr nz,final_loop
 end_fs:
-;END OF FILLSCREEN
 
 
 ; here "D" is used as a counter for the tiles we still have to overwrite
@@ -164,29 +163,26 @@ overwriteStuffLoop:
 	ld A,(BC)
 	inc BC
 	ldi (HL),A
-	ld A,0xFF				; i found out by writing any byte and then "ff" a black-on-white binary representation of that byte will be shown on the sprite
+	ld A,0xFF			; by writing any byte and then "ff" a black-on-white binary representation of that byte will be shown on the sprite
 	ldi (HL),A			; write ff to VRAM and increase
 	dec E
 	jr nz,overwriteStuffLoop	; will loop for all bytes in the tile
 	dec D
 	jr nz,overwriteStuffLoop2	; will loop for every tile in the code
-	
 
 	; an entire column will be just for the number. this saves three bytes
 	writeMonNumber:
 	ld BC,0x0810
 	; ld B,8
-	; ld C,0x10
 	wmn_black_loop:
-	ld A,(MON_NUMBER)
+	ld A,(MON_NUMBER)	; TODO: this is an immediate. maybe moving it before everything else and adding instead of loading will do something
 	ldi (HL),A
 	ld A,0xFF
 	ldi (HL),A
 	dec B
 	jr nz,wmn_black_loop
 
-
-; overwrites white and black tiles to be actually white or black
+; overwrites white and black tiles to be white or black
 	; ld A,0xFF is not needed because we loaded above
 overwrite_5455:
 	; ld C,0x10 is done with the paired loop
@@ -199,8 +195,8 @@ loop1:							; write 16 times ff to create black tile, then adds one to write 00
 	; O P T I M I S A T I O N S
 	inc A
 	jr z,overwrite_5455			; tbh this is pretty smart
+end_overwrite:
 
-; END OF OVERWRITE 
 
 	; turn the screen back on but keep sprites disabled
 	ld A,0xE1
