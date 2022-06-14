@@ -4,7 +4,7 @@ VASM_PATH = "vasmz80_oldstyle_win32.exe"
 VASM_ARGS = "-gbz80 -nocase -chklabels -dotdir -Fbin"
 TEMPFILE_NAME = "temp.bin"
 BUILT_NAME = "build/bytes.txt"
-ASM_PATH = "payload/program.asm"
+ASM_PATH = "payload/program_en.asm"
 
 try:
 	print("assembling...")
