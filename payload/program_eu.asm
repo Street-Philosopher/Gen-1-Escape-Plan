@@ -16,7 +16,7 @@ MON_NUMBER= 0xDA85
 
 
 ; preparation before changing stuff
-	di
+	; di
 VBlankCheck:
 	ldh A,(0x44)	 	; vertical position of scanline
 	cp A, 0x91			; when it's 0x91 we just entered VBlank
@@ -201,4 +201,4 @@ end_overwrite:
 	ld A,0xE1
 	ldh (0x40),A
 	
-	reti
+	ret
