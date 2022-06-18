@@ -31,6 +31,7 @@ try:
 		print()
 		print("removing temp file...")
 		os.remove(TEMPFILE_NAME)
+		print("\n\n")
 
 	print("done!")
 except Exception as e:
