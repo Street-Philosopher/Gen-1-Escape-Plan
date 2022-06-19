@@ -1,6 +1,8 @@
 ; TODO: this could be maybe potentially be optimised by removing all the 0xFF when writing to VRAM which would also double the information density, which would require a rewrite of the program
 ; i don't know if you can notice the slow realisation that the idea is not that easy after all, in the comment above
 
+; i'm sorry to whoever wants to read this code
+
 ; first box
 ; (33*20) + 1 bytes of information
 
