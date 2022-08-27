@@ -1,8 +1,10 @@
+; TODO: this could be maybe potentially be optimised by removing all the 0xFF when writing to VRAM which would also double the information density, which would require a rewrite of the program
+; i don't know if you can notice the slow realisation that the idea is not that easy after all, in the comment above
 
-;
-; this is the same exact thing as program.asm, except adapted for the European releases
-; if you assemble this instead of program.asm you'll get the list of bytes to execute on those releases
-;
+; i'm sorry to whoever wants to read this code
+
+; first box
+; (33*20) + 1 bytes of information
 
 ; index of the tile in memory used for black and white squares
 BLACK_SQUARE = 0x54
@@ -11,9 +13,8 @@ WHITE_SQUARE = 0x55
 ; memory addresses
 TILE_DATA = 0x9000
 MAP_DATA  = 0x9800
-BOX_DATA  = 0xDA9B
-MON_NUMBER= 0xDA85
-
+BOX_DATA  = 0xAD82
+MON_NUMBER= 0xAD6C
 
 ; preparation before changing stuff
 	di
@@ -48,7 +49,7 @@ VBlankCheck:
 ;
 fillScreen:
 	ld HL,MAP_DATA
-	ld BC,0x640C
+	ld BC,0x840C
 	; ld B,0x64			; to make the code centered in the screen, and to compensate for off-screen tiles
 	; ld C,0x0c
 	ld A,BLACK_SQUARE
@@ -91,52 +92,60 @@ fs_loop4:
 	dec B
 	jr nz,dataLoop
 
-	dec A				; ld A,BLACK_SQUARE
-	; the last line is different, having only 4 tiles we need to show. for this reason it has a separate part of the function
-	ld B,20
-fs_loop6:
-	ldi (HL),A
-	dec B
-	jr nz,fs_loop6
+	; dec A				; ld A,BLACK_SQUARE
+; 	; the last line is different, having only 4 tiles we need to show. for this reason it has a separate part of the function
+; 	ld B,20
+; fs_loop6:
+; 	ldi (HL),A
+; 	dec B
+; 	jr nz,fs_loop6
 
-	inc A
-	ldi (HL),A
+; 	inc A
+; 	ldi (HL),A
 
-	ld A,C
+; 	ld A,C
 
-	ldi (HL),A
-	inc A
-	ldi (HL),A
-	inc A						; 4 tiles, then a white tile
-	ldi (HL),A
-	inc A
-	ldi (HL),A
+; 	ldi (HL),A
+; 	inc A
+; 	ldi (HL),A
+; 	inc A						; 4 tiles, then a white tile
+; 	ldi (HL),A
+; 	inc A
+; 	ldi (HL),A
 
-	ld A,WHITE_SQUARE
-	ld BC,0x0714		; load 7 in B and 20 in C, by pairing two registers we save a load
-	; ld B,7
-	; ld C,20
-fs_loop7:						; since we only have 4 data tiles, we fill the other 6 tiles in the line with white frame tiles
-	ldi (HL),A
-	dec B
-	jr nz,fs_loop7
+; 	ld A,WHITE_SQUARE
+; 	ld BC,0x0714		; load 7 in B and 20 in C, by pairing two registers we save a load
+; 	; ld B,7
+; 	; ld C,20
+; fs_loop7:						; since we only have 4 data tiles, we fill the other 6 tiles in the line with white frame tiles
+; 	ldi (HL),A
+; 	dec B
+; 	jr nz,fs_loop7
 
 	; last new line
-	dec A		; ld A,BLACK_SQUARE
-fs_loop8:
-	ldi (hl),a
-	dec c
-	jr nz,fs_loop8
+; 	dec A		; ld A,BLACK_SQUARE
+; fs_loop8:
+; 	ldi (hl),a
+; 	dec c
+; 	jr nz,fs_loop8
 	
 	; bottom row of the frame
-	ld bc,0x0C84
+	ld bc,0x1484
 	; ld B,12
 	; ld C,0x84
-	inc A; ld a,WHITE_SQUARE
+	dec A; ld a,BLACK_SQUARE
 fs_loop69:
 	ldi (HL),A
 	dec B
 	jr nz,fs_loop69
+
+	ld b,12; TODO: ottimizzare questo
+	inc A;ld A,WHITE_SQUARE
+fs_loop_idk:
+	ldi (hl),a
+	dec b
+	jr nz,fs_loop_idk
+
 	; after the white frame, we cover the rest of the screen with black tiles
 	dec A;ld A,BLACK_SQUARE
 final_loop:
@@ -152,6 +161,15 @@ end_fs:
 ; "E" is also used as a counter. it counts the number of bytes in each tile (8)
 ; this overwrites the tile data with our data
 overwriteStuff:
+
+	; turn on SRAM, because in GSC box data is stored there
+	ld a,1
+	ld ($6000),a
+	ld a,0x0A
+	ld ($0000),a
+	ld a,1
+	ld ($4000),a
+
 	ld D,0x53				; we do this for 0x53 (84, since we count 0) tiles
 	ld HL,TILE_DATA
 	ld BC,BOX_DATA
@@ -173,7 +191,7 @@ overwriteStuffLoop:
 	ld BC,0x0810
 	; ld B,8
 	wmn_black_loop:
-	ld A,(MON_NUMBER)
+	ld A,(MON_NUMBER)	; TODO: this is an immediate. maybe moving it before everything else and adding instead of loading will do something
 	ldi (HL),A
 	ld A,0xFF
 	ldi (HL),A
@@ -195,9 +213,12 @@ loop1:							; write 16 times ff to create black tile, then adds one to write 00
 	jr z,overwrite_5455			; tbh this is pretty smart
 end_overwrite:
 
+	;turn SRAM back off
+	xor A
+	ld ($0000),A
 
 	; turn the screen back on but keep sprites disabled
-	ld A,0xE1
+	ld A,0xE3
 	ldh (0x40),A
 	
 	reti

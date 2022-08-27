@@ -26,7 +26,7 @@ VBlankCheck:
 	xor A,A
 	; what's important is that bit 7 is off (turns off the screen), we will set the other settings at the end anyways
 	ldh (0x40),A			; LCD settings
-	ldh (0xD7),A			; block tile animations. otherwise tiles like flowers would constantly change, breaking our image
+; TODO: tell people to go in a building before
 ; end of prep
 
 ; this will overwrite the current map data to show on screen a frame (black and white) containing all different tiles
