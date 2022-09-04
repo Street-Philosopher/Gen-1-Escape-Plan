@@ -3,10 +3,12 @@ import os
 #wtf is this lmao
 # from sqlite3 import ProgrammingError
 
+#set this to the path to your csc.exe
+CSC_PATH = "csc"
+
 DEPENDENCIES_PATH = "converter\dependencies"
 SCRIPT_PATH = f"converter\converter.cs"
 BUILD_PATH = "build/converter.exe"
-CSC_PATH = "csc"
 
 try:
 	os.system(f'{CSC_PATH} /r:"{DEPENDENCIES_PATH}\PKHeX.Core.dll" /r:"{DEPENDENCIES_PATH}\\netstandard.dll" /out:{BUILD_PATH} {SCRIPT_PATH}')
