@@ -1,6 +1,8 @@
 import os, glob
 
+#set this to the path to your vasmz80_oldstyle_win32.exe
 VASM_PATH = "./__vasm" if os.name == "posix" else "__vasm.exe"
+
 VASM_ARGS = "-gbz80 -nocase -chklabels -dotdir -Fbin"
 BUILD_PATH = "build/"
 ASM_PATH = "payload/"
