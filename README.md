@@ -12,7 +12,7 @@ First step is to execute the ACE program. Find any setup that you like (i recomm
 
 **Important**: before executing the program, you should enter a pokémon centre. It doesn't _have_ to be a pokémon centre, as long as the top-left tile of your screen is at co-ordinates 0-0 and there are no moving tiles on screen, but entering a building is the easiest way of achieving this.
 
-After executing the program, exit any menus you may be in: your GameBoy screen will show a code. If you want to continue the process in a later moment you'll have to take a picture; if you do, make sure that **EACH INDIVIDUAL** pixel of the GameBoy screen are perfectly visible and distinct, otherwise you will _not_ be able to decode it from the picture.
+After executing the program, exit any menus you may be in: your GameBoy screen will show a code. If you want to continue the process in a later moment you'll have to take a picture; if you do, make sure that _each individual_ pixel of the GameBoy screen are perfectly visible and distinct, otherwise you will _not_ be able to decode it from the picture.
 
 After that, the code will have to be read for its data to be decripted. I'm working on a way to do this automatically, but currently there isn't one yet. If you want to read it manually, follow these instructions exactly:
 1) The code has black and dark pixels: you should read the code by squares, 8 pixels by 8 pixels
