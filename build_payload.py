@@ -1,9 +1,12 @@
 import os, glob
 
-VASM_PATH = "./__vasm"
+VASM_PATH = "./__vasm" if os.name == "posix" else "__vasm.exe"
 VASM_ARGS = "-gbz80 -nocase -chklabels -dotdir -Fbin"
 BUILD_PATH = "build/"
 ASM_PATH = "payload/"
+
+if not os.path.isdir(BUILD_PATH):
+	os.mkdir(BUILD_PATH)
 
 try:
 	print("assembling...")
