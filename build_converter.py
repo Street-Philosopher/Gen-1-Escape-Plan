@@ -6,9 +6,10 @@ import os
 DEPENDENCIES_PATH = "converter\dependencies"
 SCRIPT_PATH = f"converter\converter.cs"
 BUILD_PATH = "build/converter.exe"
+CSC_PATH = "csc"
 
 try:
-	os.system(f'csc /r:"{DEPENDENCIES_PATH}\PKHeX.Core.dll" /r:"{DEPENDENCIES_PATH}\\netstandard.dll" /out:{BUILD_PATH} {SCRIPT_PATH}')
+	os.system(f'{CSC_PATH} /r:"{DEPENDENCIES_PATH}\PKHeX.Core.dll" /r:"{DEPENDENCIES_PATH}\\netstandard.dll" /out:{BUILD_PATH} {SCRIPT_PATH}')
 	print("done!")
 except Exception as e:
 	print("error while building:\n" + str(e))
