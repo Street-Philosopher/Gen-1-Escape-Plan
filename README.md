@@ -21,7 +21,7 @@ After that, the code will have to be read for its data to be decripted. I'm work
 
 _Note_: to make things faster if you want to interpret manually, note that you don't have to transcribe all of the 672 lines. Instead, you only have to read (33 times the number of pokémons in your box) lines. For example, if you have only five pokémon you must read 33 * 5 = 165 lines, which means you should end in the 21st square.
 
-When you have all the numbers in place, you can download the decoder and pass in the numbers when asked to. If you did not decode all of the lines, simply write 0 when the program asks you for those lines.
+When you have all the numbers in place, you can download the decoder and pass in the numbers when asked to. If you did not decode all of the lines, simply write 0 (or any other value) when the program asks you for those lines.
 
 
 
