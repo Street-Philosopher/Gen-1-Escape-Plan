@@ -26,7 +26,6 @@ VBlankCheck:
 	xor A,A
 	; what's important is that bit 7 is off (turns off the screen), we will set the other settings at the end anyways
 	ldh (0x40),A			; LCD settings
-; TODO: tell people to go in a building before
 ; end of prep
 
 ; this will overwrite the current map data to show on screen a frame (black and white) containing all different tiles
@@ -185,7 +184,7 @@ overwriteStuffLoop:
 ; overwrites white and black tiles to be white or black
 	; ld A,0xFF is not needed because we loaded above
 overwrite_5455:
-	; ld C,0x10 is done with the paired loop
+	; ld C,0x10 is done with the paired loop above
 loop1:							; write 16 times ff to create black tile, then adds one to write 00, which creates white tile. this way i don't have to rewrite the function
 	ldi (HL),A
 	dec C

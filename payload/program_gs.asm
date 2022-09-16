@@ -1,6 +1,3 @@
-; TODO: this could be maybe potentially be optimised by removing all the 0xFF when writing to VRAM which would also double the information density, which would require a rewrite of the program
-; i don't know if you can notice the slow realisation that the idea is not that easy after all, in the comment above
-
 ; i'm sorry to whoever wants to read this code
 
 ; first box
@@ -91,47 +88,10 @@ fs_loop4:
 
 	dec B
 	jr nz,dataLoop
-
-	; dec A				; ld A,BLACK_SQUARE
-; 	; the last line is different, having only 4 tiles we need to show. for this reason it has a separate part of the function
-; 	ld B,20
-; fs_loop6:
-; 	ldi (HL),A
-; 	dec B
-; 	jr nz,fs_loop6
-
-; 	inc A
-; 	ldi (HL),A
-
-; 	ld A,C
-
-; 	ldi (HL),A
-; 	inc A
-; 	ldi (HL),A
-; 	inc A						; 4 tiles, then a white tile
-; 	ldi (HL),A
-; 	inc A
-; 	ldi (HL),A
-
-; 	ld A,WHITE_SQUARE
-; 	ld BC,0x0714		; load 7 in B and 20 in C, by pairing two registers we save a load
-; 	; ld B,7
-; 	; ld C,20
-; fs_loop7:						; since we only have 4 data tiles, we fill the other 6 tiles in the line with white frame tiles
-; 	ldi (HL),A
-; 	dec B
-; 	jr nz,fs_loop7
-
-	; last new line
-; 	dec A		; ld A,BLACK_SQUARE
-; fs_loop8:
-; 	ldi (hl),a
-; 	dec c
-; 	jr nz,fs_loop8
 	
 	; bottom row of the frame
 	ld bc,0x1484
-	; ld B,12
+	; ld B,14
 	; ld C,0x84
 	dec A; ld a,BLACK_SQUARE
 fs_loop69:
@@ -139,7 +99,7 @@ fs_loop69:
 	dec B
 	jr nz,fs_loop69
 
-	ld b,12; TODO: ottimizzare questo
+	ld b,12
 	inc A;ld A,WHITE_SQUARE
 fs_loop_idk:
 	ldi (hl),a
@@ -191,7 +151,7 @@ overwriteStuffLoop:
 	ld BC,0x0810
 	; ld B,8
 	wmn_black_loop:
-	ld A,(MON_NUMBER)	; TODO: this is an immediate. maybe moving it before everything else and adding instead of loading will do something
+	ld A,(MON_NUMBER)
 	ldi (HL),A
 	ld A,0xFF
 	ldi (HL),A
