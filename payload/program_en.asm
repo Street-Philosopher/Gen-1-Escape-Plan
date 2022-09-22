@@ -6,9 +6,10 @@
 ; first box
 ; (33*20) + 1 bytes of information
 
-; index of the tile in memory used for black and white squares
-BLACK_SQUARE = 0x54
-WHITE_SQUARE = 0x55
+; tiles stuff
+TILES_TO_WRITE = 0x53
+BLACK_SQUARE = TILES_TO_WRITE + 1 ; index in memory of the full black tile
+WHITE_SQUARE = BLACK_SQUARE + 1   ; index in memory of the full white tile
 
 ; memory addresses
 TILE_DATA = 0x9000
@@ -157,17 +158,17 @@ end_fs:
 ; "E" is also used as a counter. it counts the number of bytes in each tile (8)
 ; this overwrites the tile data with our data
 overwriteStuff:
-	ld D,0x53				; we do this for 0x53 (84, since we count 0) tiles
+	ld D,TILES_TO_WRITE			; including 0
 	ld HL,TILE_DATA
 	ld BC,BOX_DATA
 overwriteStuffLoop2:
 	ld E,8			; every tile has 8 bytes
 overwriteStuffLoop:
-	ld A,(BC)
-	inc BC
-	ldi (HL),A
-	ld A,0xFF			; by writing any byte and then "ff" a black-on-white binary representation of that byte will be shown on the sprite
-	ldi (HL),A			; write ff to VRAM and increase
+	ld A,(BC)			;
+	inc BC				; current_byte = *(data_to_read++)
+	ldi (HL),A			; *(graphics_ptr++) = current_byte
+	ld A,0xFF			; *(graphics_ptr++) = 0xFF          // writing a byte and then 0xFF will creeate a line with the binary representation of that first byte
+	ldi (HL),A			;
 	dec E
 	jr nz,overwriteStuffLoop	; will loop for all bytes in the tile
 	dec D
@@ -185,19 +186,19 @@ overwriteStuffLoop:
 	dec B
 	jr nz,wmn_black_loop
 
-; overwrites white and black tiles to be white or black
+; overwrites the white and black tiles of the frame to be full-white or full-black
 	; ld A,0xFF is not needed because we loaded above
 overwrite_5455:
-	; ld C,0x10 is done with the paired loop above
-loop1:							; write 16 times ff to create black tile, then adds one to write 00, which creates white tile. this way i don't have to rewrite the function
+	; ld C,0x10 is done with the paired loop above. the second time we write 0x100 bytes but its ok because we overwrite unused tiles
+loop1:				; write 16 (size in bytes of a tile) times ff to create black tile, then adds one to write 00, which creates white tile. this way i don't have to rewrite the function
 	ldi (HL),A
 	dec C
-	jr nz,loop1			; write all 16 bytes as a sprite is 16 bytes long
+	jr nz,loop1
 	
-	; adds one, and jumps back to the start if there was an overflow. this way we only jump the first time (as "a" contains ff), AND we get the correct value for "a" to write
+	; adds one, and jumps back to the start if there was an overflow (a=0). this way we only jump the first time (a=0xFF), AND we get the correct value for "a" to write
 	; O P T I M I S A T I O N S
 	inc A
-	jr z,overwrite_5455			; tbh this is pretty smart
+	jr z,overwrite_5455
 end_overwrite:
 
 
