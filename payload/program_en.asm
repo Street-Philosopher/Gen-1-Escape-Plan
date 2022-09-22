@@ -16,14 +16,18 @@ MAP_DATA  = 0x9800
 BOX_DATA  = 0xDA96
 MON_NUMBER= 0xDA80
 
+VLANK_START = 0x91
+
 ; preparation before changing stuff
 	di
 VBlankCheck:
 	ldh A,(0x44)	 	; vertical position of scanline
-	cp A, 0x91			; when it's 0x91 we just entered VBlank
+	; CP is just SUB, except it doesn't store a result. we are checking when A-0x91 == 0.
+	; since we need to set A to zero afterwards anyways we can use SUB, which does the same AND stores the result (zero)
+	sub A, VLANK_START
 	jr nz,VBlankCheck
 
-	xor A,A
+	; xor A,A
 	; what's important is that bit 7 is off (turns off the screen), we will set the other settings at the end anyways
 	ldh (0x40),A			; LCD settings
 ; end of prep
