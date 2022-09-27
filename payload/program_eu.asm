@@ -19,10 +19,9 @@ MON_NUMBER= 0xDA85
 	di
 VBlankCheck:
 	ldh A,(0x44)	 	; vertical position of scanline
-	cp A, 0x91			; when it's 0x91 we just entered VBlank
+	sub A, 0x91			; when it's 0x91 we just entered VBlank
 	jr nz,VBlankCheck
 
-	xor A,A
 	; what's important is that bit 7 is off (turns off the screen), we will set the other settings at the end anyways
 	ldh (0x40),A			; LCD settings
 ; end of prep

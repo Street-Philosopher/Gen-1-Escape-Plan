@@ -1,5 +1,10 @@
+import os
 import tkinter as tk
-from PIL import Image, ImageTk
+try:
+	from PIL import Image, ImageTk
+except:
+	os.system("pip install pillow")
+	from PIL import Image, ImageTk
 
 #window setup
 window = tk.Tk()
@@ -60,11 +65,11 @@ def ShowMap():
 	#END
 
 	#map
-	mapImage = ImageTk.PhotoImage(Image.open('map.png'))
+	mapImage = ImageTk.PhotoImage(Image.open('res/map.png'))
 	canvas.create_image(0, 0, anchor=tk.NW, image=mapImage)
 
 	#red sprite
-	redImage = ImageTk.PhotoImage(Image.open('red.png'))
+	redImage = ImageTk.PhotoImage(Image.open('res/red.png'))
 	red = canvas.create_image(0, 0, anchor=tk.NW, image=redImage)
 
 	#label that says current byte
@@ -93,7 +98,8 @@ def readbytes(file):
 
 #main menu selection
 lab1 = tk.Label(window, text="What release are you playing?"); lab1.pack()
-btn1 = tk.Button(window, text="English Release", command=lambda:(readbytes("bytes_en.txt"), ShowMap())); btn1.pack()
-btn2 = tk.Button(window, text="European Release", command=lambda:(readbytes("bytes_eu.txt"), ShowMap())); btn2.pack()
+btn1 = tk.Button(window, text="English Release", command=lambda:(readbytes("res/bytes_en.txt"), ShowMap())); btn1.pack()
+btn2 = tk.Button(window, text="European Release", command=lambda:(readbytes("res/bytes_eu.txt"), ShowMap())); btn2.pack()
+btn3 = tk.Button(window, text="English Gold/Silver", command=lambda:(readbytes("res/bytes_gs.txt"), ShowMap())); btn3.pack()
 
 window.mainloop()
