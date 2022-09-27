@@ -28,9 +28,8 @@ VBlankCheck:
 	sub A, VLANK_START
 	jr nz,VBlankCheck
 
-	; xor A,A
-	; what's important is that bit 7 is off (turns off the screen), we will set the other settings at the end anyways
-	ldh (0x40),A			; LCD settings
+	; xor A,A not needed
+	ldh (0x40),A			; turn off LCD
 ; end of prep
 
 ; this will overwrite the current map data to show on screen a frame (black and white) containing all different tiles
