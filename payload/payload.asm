@@ -1,3 +1,4 @@
+; i'm sorry to whoever wants to read this code
 
 RB_EN = 1
 RB_EU = 2
@@ -13,8 +14,6 @@ SECTION "main", rom0
 
 ; TODO: this could be maybe potentially be optimised by removing all the $FF when writing to VRAM which would also double the information density, which would require a rewrite of the program
 ; i don't know if you can notice the slow realisation that the idea is not that easy after all, in the comment above
-
-; i'm sorry to whoever wants to read this code
 
 ; first box
 ; (33*20) + 1 bytes of information
@@ -266,8 +265,8 @@ IF VERSION == RB_EN || VERSION == RB_EU
 	ld A,$E1
 	ldh [$40],A
 ELIF VERSION == GS_EN
-	;turn SRAM back off and re-enable LCD with no sprites
-	xor A
+	; turn SRAM back off and re-enable LCD with no sprites. uses different LCD settings 
+	; A is already zero, so 'xor A,A' is not necessary
 	ld [$0000],A
 	ld A,$E3
 	ldh [$40],A
