@@ -1,4 +1,4 @@
-import os
+import os, glob
 import tkinter as tk
 try:
 	from PIL import Image, ImageTk
@@ -98,8 +98,10 @@ def readbytes(file):
 
 #main menu selection
 lab1 = tk.Label(window, text="What release are you playing?"); lab1.pack()
-btn1 = tk.Button(window, text="English Release", command=lambda:(readbytes("res/bytes_en.txt"), ShowMap())); btn1.pack()
-btn2 = tk.Button(window, text="European Release", command=lambda:(readbytes("res/bytes_eu.txt"), ShowMap())); btn2.pack()
-btn3 = tk.Button(window, text="English Gold/Silver", command=lambda:(readbytes("res/bytes_gs.txt"), ShowMap())); btn3.pack()
+bytes_dir = "../build/*.txt" if os.path.isdir("../build") else "res/*.txt"
+for file in glob.glob(bytes_dir):
+	fname = os.path.basename(file)[:-len(".txt")].replace("_", " ").replace("-", "/")
+	btn = tk.Button(window, text=fname, command=lambda:(readbytes(file), ShowMap()))
+	btn.pack()
 
 window.mainloop()

@@ -7,12 +7,12 @@ try:
 		os.mkdir(BUILD_PATH)
 
 	print("building the converter...")
-	if os.system("python3 build_converter.py no") != 0:
+	if os.system("python3 " if os.name == "posix" else "" + "build_converter.py no") != 0:
 		print("build aborted")
 		exit(-1)
 
 	print("\n")
-	if os.system("python3 build_payload.py no")   != 0:
+	if os.system("python3 " if os.name == "posix" else "" + "build_payload.py no")   != 0:
 		print("build aborted")
 		exit(-1)
 
@@ -23,17 +23,16 @@ try:
 	os.mkdir (f"{BUILD_PATH}/{PAYLOAD_FOLDER}/res")
 
 	os.rename(f"{BUILD_PATH}/{CONV_BUILD_NAME}", f"{BUILD_PATH}/{CONVERTER_FOLDER}/{CONV_BUILD_NAME}")
-	os.system(f"cp {'converter/dependencies/PKHeX.Core.dll'} {f'{BUILD_PATH}/{CONVERTER_FOLDER}'}")
+	shutil.copyfile("converter/dependencies/PKHeX.Core.dll", f'{BUILD_PATH}/{CONVERTER_FOLDER}/PKHeX.Core.dll')
 
 	#copy py script into pyw
-	os.system(f"cp byteReader/bytesReader.ig.py {BUILD_PATH}/{PAYLOAD_FOLDER}/bytesReader.pyw")
+	shutil.copyfile("byteReader.py", f"{BUILD_PATH}/{PAYLOAD_FOLDER}/bytes_reader.pyw")
 	#copy bytes files
 	for file in glob.glob(f"{BUILD_PATH}/*.txt"):
 		os.rename(file, f"{BUILD_PATH}/{PAYLOAD_FOLDER}/res/{os.path.basename(file)}")
 	#copy any asset
-	for file in glob.glob("byteReader/*"):
-		if not file.endswith(".ig.py"):	#the main script ends in .ig.py, we don't want to copy that
-			os.system(f"cp \"{file}\" \"{BUILD_PATH}/{PAYLOAD_FOLDER}/res/\"")
+	for file in glob.glob("byteReader/res/*"):
+		shutil.copyfile(file, f"{BUILD_PATH}/{PAYLOAD_FOLDER}/res/{os.path.basename(file)}")
 
 	print("zipping...")
 	shutil.make_archive(f"{BUILD_PATH}/{CONVERTER_FOLDER}", 'zip', f"{BUILD_PATH}/{CONVERTER_FOLDER}")
@@ -59,7 +58,7 @@ finally:
 	for dir in dirs_for_cleanup:
 		if os.path.isdir(dir):
 			os.remove(dir)
-	for file in glob.glob(f"{BUILD_PATH}/bytes_*.txt"):
+	for file in glob.glob(f"{BUILD_PATH}/*.txt"):
 		os.remove(file)
 	for file in files_for_cleanup:
 		if os.path.isfile(file):
