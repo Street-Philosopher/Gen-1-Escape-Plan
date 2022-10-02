@@ -6,7 +6,8 @@ BUILD_PATH = "build"
 
 # executables / tools
 CSC_PATH  = "mcs"      if _osname == "posix" else "csc.exe"
-VASM_PATH = "./__vasm" if _osname == "posix" else "__vasm.exe"
+ASM_PATH  = "rgbasm"
+LINK_PATH = "rgblink"
 
 CONVERTER_FOLDER = "converter"
 PAYLOAD_FOLDER   = "bytes"
@@ -21,5 +22,11 @@ CONV_DEPENDENCIES_PATH = "converter/dependencies"
 CONV_SRC_PATH = f"converter/converter.cs"
 
 #payload stuff
-VASM_ARGS = "-gbz80 -nocase -chklabels -dotdir -Fbin"
-PAYLOAD_SRC_PATH = "payload/"
+ASM_ARGS  = ""			#"-gbz80 -nocase -chklabels -dotdir -Fbin"
+LINK_ARGS = "-x"
+PAYLOAD_SRC_PATH = "payload/payload.asm"
+PAYLOAD_BUILDS = {
+	"R-B_English" : 1,
+	"R-B_Europe"  : 2,
+	"G-S_English" : 3,
+}

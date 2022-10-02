@@ -1,26 +1,34 @@
 import os, glob
+from pickle import BUILD
 
 from build_constants import *
 
 if not os.path.isdir(BUILD_PATH):
 	os.mkdir(BUILD_PATH)
 
+# rgbasm [file] -o [out]
+# rgblink [out] -x -o out.temp
+# out.temp->remove_unnecessary
+# writebytes.txt(out.temp)
+# remove(out, out.temp)
+
 try:
-	print("assembling the payload...")
+	print("assembling the payloads...")
 	retval = 0		#if any thing has a return value of not 0 then this will be != 0
 
-	for FILE in glob.glob(PAYLOAD_SRC_PATH + "program_*.asm"):
-		ext = FILE[len(PAYLOAD_SRC_PATH + "program_") : -len(".asm")]		#this will remove everything except the "version"
-		print("building the", ext, "version:")
+	TEMPFILE_NAME = f"{BUILD_PATH}/payload.temp"		#name of the temp file created by the assembler
+	LINK_TEMP_NAME= f"{BUILD_PATH}/payload.link"		#name of the temp file created by the linker
 
-		TEMPFILE_NAME = ext + ".temp"					#name of the temp file that will be created
-		BUILT_NAME = f"{BUILD_PATH}/bytes_{ext}.txt"	#name of the built file
+	for VERSION in PAYLOAD_BUILDS:
+		print("building the", VERSION, "version")
 
-		retval += os.system(f'{VASM_PATH} {VASM_ARGS} -o "{TEMPFILE_NAME}" "{FILE}"')
+		BUILT_NAME = f"{BUILD_PATH}/{VERSION}.txt"		#name of the built file
 
-		print()
+		retval += os.system(f'{ASM_PATH} {ASM_ARGS} -D VERSION={PAYLOAD_BUILDS[VERSION]} -o "{TEMPFILE_NAME}" "{PAYLOAD_SRC_PATH}"')
+		retval += os.system(f'{LINK_PATH} {LINK_ARGS} -x -o "{LINK_TEMP_NAME}" "{TEMPFILE_NAME}"')
+
 		print("writing the bytes.txt file...")
-		with open(TEMPFILE_NAME, "rb") as ifile, open(BUILT_NAME, "w") as ofile:
+		with open(LINK_TEMP_NAME, "rb") as ifile, open(BUILT_NAME, "w") as ofile:
 			allbytes = list(ifile.read(-1))
 			res = ""
 			for byte in allbytes:
@@ -29,10 +37,11 @@ try:
 			res = res[:-1]	#get rid of the last endline
 			ofile.write(res)
 
-		print()
-		print("removing temp file...")
+		print("removing temp files...")
 		os.remove(TEMPFILE_NAME)
+		os.remove(LINK_TEMP_NAME)
 		print("\n\n")
+	#END FOR
 
 	if retval != 0:
 		RET_CODE = 1
