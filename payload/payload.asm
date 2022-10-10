@@ -36,7 +36,7 @@ ELIF VERSION == GS_EN
 	def BOX_DATA   = $AD82
 	def MON_NUMBER = $AD6C
 ELSE
-	FAIL "Invalid build"
+	FAIL "Invalid build version"
 ENDC
 
 VLANK_START = $91
@@ -51,7 +51,7 @@ VBlankCheck:
 	jr nz,VBlankCheck
 
 	; xor A,A not needed
-	ldh [$40],A			; turn off LCD
+	ldh [$40],A		; turn off LCD
 ; end of prep
 
 ; this will overwrite the current map data to show on screen a frame (black and white) containing all different tiles
