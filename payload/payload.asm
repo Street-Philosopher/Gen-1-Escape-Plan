@@ -9,7 +9,7 @@ IF DEF(VERSION) == 0
 	FAIL "No build specified"
 ENDC
 
-SECTION "a", ROM0	; RGBASM doesn't let me do cool things so I have to put this here
+SECTION "", ROM0	; RGBASM doesn't let me do cool things so I have to put this here
 LOAD "main", WRAMX[$D901]
 
 ; TODO: this could be maybe potentially be optimised by removing all the $FF when writing to VRAM which would also double the information density, which would require a rewrite of the program
@@ -18,14 +18,17 @@ LOAD "main", WRAMX[$D901]
 ; first box
 ; (33*20) + 1 bytes of information
 
-; tiles stuff
-def TILES_TO_WRITE equ $53
-def BLACK_SQUARE equ TILES_TO_WRITE + 1 ; index in memory of the full black tile
-def WHITE_SQUARE equ BLACK_SQUARE + 1   ; index in memory of the full white tile
+; program constants
+TILES_TO_WRITE = $53
+BLACK_SQUARE   = TILES_TO_WRITE + 1 ; index in memory of the full black tile
+WHITE_SQUARE   = BLACK_SQUARE + 1   ; index in memory of the full white tile
+
+; other constants
+VBLANK_START = $91
 
 ; memory addresses
-def TILE_DATA = $9000
-def MAP_DATA  = $9800
+TILE_DATA = $9000
+MAP_DATA  = $9800
 IF   VERSION == RB_EN
 	def BOX_DATA   = $DA96
 	def MON_NUMBER = $DA80
@@ -39,15 +42,13 @@ ELSE
 	FAIL "Invalid build version"
 ENDC
 
-VLANK_START = $91
-
 ; preparation before changing stuff
 	di
 VBlankCheck:
 	ldh A,[$44]	 	; vertical position of scanline
 	; CP is just SUB, except it doesn't store a result. we are checking when A-$91 == 0.
 	; since we need to set A to zero afterwards anyways we can use SUB, which does the same AND stores the result (zero)
-	sub A, VLANK_START
+	sub A, VBLANK_START
 	jr nz,VBlankCheck
 
 	; xor A,A not needed
