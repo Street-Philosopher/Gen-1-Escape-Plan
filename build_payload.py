@@ -27,6 +27,8 @@ try:
 		retval += os.system(f'{ASM_PATH} {ASM_ARGS} -D VERSION={PAYLOAD_BUILDS[VERSION]} -o "{TEMPFILE_NAME}" "{PAYLOAD_SRC_PATH}"')
 		retval += os.system(f'{LINK_PATH} {LINK_ARGS} -x -o "{LINK_TEMP_NAME}" "{TEMPFILE_NAME}"')
 
+		if retval != 0: raise Exception("assembly failed")
+
 		print("writing the bytes.txt file...")
 		with open(LINK_TEMP_NAME, "rb") as ifile, open(BUILT_NAME, "w") as ofile:
 			allbytes = list(ifile.read(-1))

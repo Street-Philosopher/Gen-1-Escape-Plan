@@ -9,8 +9,8 @@ IF DEF(VERSION) == 0
 	FAIL "No build specified"
 ENDC
 
-; this is not rom, but rgbasm is annoying and doesn't let me do things
-SECTION "main", rom0
+SECTION "a", ROM0	; RGBASM doesn't let me do cool things so I have to put this here
+LOAD "main", WRAMX[$D901]
 
 ; TODO: this could be maybe potentially be optimised by removing all the $FF when writing to VRAM which would also double the information density, which would require a rewrite of the program
 ; i don't know if you can notice the slow realisation that the idea is not that easy after all, in the comment above
