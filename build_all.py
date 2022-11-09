@@ -26,7 +26,7 @@ try:
 	shutil.copyfile("converter/dependencies/PKHeX.Core.dll", f'{BUILD_PATH}/{CONVERTER_FOLDER}/PKHeX.Core.dll')
 
 	#copy py script into pyw
-	shutil.copyfile("byteReader.py", f"{BUILD_PATH}/{PAYLOAD_FOLDER}/bytes_reader.pyw")
+	shutil.copyfile("byteReader.py", f"{BUILD_PATH}/{PAYLOAD_FOLDER}/reader.pyw")
 	#copy bytes files
 	for file in glob.glob(f"{BUILD_PATH}/*.txt"):
 		os.rename(file, f"{BUILD_PATH}/{PAYLOAD_FOLDER}/res/{os.path.basename(file)}")
@@ -64,6 +64,5 @@ finally:
 		if os.path.isfile(file):
 			os.remove(file)
 
-print("all finished!\n")
-os.system("/bin/bash -c 'read -s -n 1 -p \"Press any key to continue...\n\"'" if os.name == "posix" else "pause")
+#os.system("/bin/bash -c 'read -s -n 1 -p \"Press any key to continue...\n\"'" if os.name == "posix" else "pause")
 exit(RET_CODE)
