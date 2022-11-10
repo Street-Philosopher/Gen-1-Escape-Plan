@@ -8,13 +8,13 @@ This way, it is possible to transfer pokémon from gen1: there are many other wa
 # Usage
 More detailed instructions can be found [here](https://docs.google.com/document/d/1CY9rRGymB8hse_mWoYx-IilI3dXrkb2gseOIo8w0cNw/edit?usp=sharing).
 
-First step is to execute the ACE program. Find any setup that you like (i recommend [this](https://www.youtube.com/watch?v=D3EvpRHL_vk) one for RB), write the program you find in the version of bytes.txt corresponding to the game you're playing on and execute it.
+First step is to execute the ACE program. Find any setup that you like (i recommend [this](https://www.youtube.com/watch?v=D3EvpRHL_vk) one for RB), write the program you find in the version of bytes.txt corresponding to the game you're playing on and execute it (if you're using the setup I mentioned above, the [bytesReader.py](byteReader/bytesReader.py) script you'll find in the release will automatically convert it into coordinates so you don't have to).
 
 **Important**: before executing the program, you should enter a pokémon centre. It doesn't _have_ to be a pokémon centre, as long as the top-left tile of your screen is at co-ordinates 0-0 and there are no moving tiles on screen, but entering a building is the easiest way of achieving this.
 
 After executing the program, exit any menus you may be in: your GameBoy screen will show a code. If you want to continue the process in a later moment you'll have to take a picture; if you do, make sure that _each individual_ pixel of the GameBoy screen are perfectly visible and distinct, otherwise you will _not_ be able to decode it from the picture.
 
-After that, the code will have to be read for its data to be decripted. I'm working on a way to do this automatically, but currently there isn't one yet. If you want to read it manually, follow these instructions exactly:
+If you want to read the code manually, follow these instructions exactly:
 1) The code has black and dark pixels: you should read the code by squares, 8 pixels by 8 pixels
 2) The first square is the top left, second is the one to its right and so on. Once you reach the end of the line, go back to the left and down one line
 3) Each square will be read in the following way: take the first row of pixels (the topmost line) and write down all dark pixels as a 0, and all black pixels as a 1. Then, use a binary converter (like [this](https://www.mathsisfun.com/binary-decimal-hexadecimal-converter.html)) to convert this binary string to a number in decimal and write down the number you get. Once you have written down the number you can go to the next row, and start with a new binary string.
@@ -26,7 +26,7 @@ When you have all the numbers in place, you can download the decoder and pass in
 
 
 # Building
-All you have to do is run the .py files in the root directory, but there are a couple of requirements: you need to have csc.exe (C# compiler) and vasmz80_oldstyle_win32.exe, and set the path where they're located in the python scripts where they're needed ([build_converter.py](build_converter.py) and [build_payload.py](build_payload.py), respectively). Finally, the dependencies to build the C# app are:
+All you have to do is run the .py files in the root directory, but to compile you need to have a C# compiler and rgbds. You can change their location and some other options in the [common constants](build_constants.py) file. Finally, the dependencies to build the C# script are:
 + PKHeX.Core.dll
 + netstandard.dll
 

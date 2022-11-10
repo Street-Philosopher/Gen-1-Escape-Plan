@@ -26,7 +26,7 @@ try:
 	shutil.copyfile("converter/dependencies/PKHeX.Core.dll", f'{BUILD_PATH}/{CONVERTER_FOLDER}/PKHeX.Core.dll')
 
 	#copy py script into pyw
-	shutil.copyfile("byteReader.py", f"{BUILD_PATH}/{PAYLOAD_FOLDER}/bytes_reader.pyw")
+	shutil.copyfile("byteReader.py", f"{BUILD_PATH}/{PAYLOAD_FOLDER}/reader.pyw")
 	#copy bytes files
 	for file in glob.glob(f"{BUILD_PATH}/*.txt"):
 		os.rename(file, f"{BUILD_PATH}/{PAYLOAD_FOLDER}/res/{os.path.basename(file)}")
