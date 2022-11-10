@@ -9,14 +9,13 @@ CSC_PATH  = "mcs"      if _osname == "posix" else "csc.exe"
 ASM_PATH  = "rgbasm"
 LINK_PATH = "rgblink"
 
-CONVERTER_FOLDER = "converter"
+CONVERTER_FOLDER = "monconverter"
 PAYLOAD_FOLDER   = "bytes"
 
 # converter stuff
 CONV_BUILD_NAME = "converter" if _osname == "posix" else "converter.exe"
 CONV_DEPENDENCIES = [
 	"PKHeX.Core.dll",
-	"netstandard.dll",
 ]
 CONV_DEPENDENCIES_PATH = "converter/dependencies"
 CONV_SRC_PATH = f"converter/converter.cs"
@@ -30,3 +29,7 @@ PAYLOAD_BUILDS = {
 	"R-B_Europe"  : 2,
 	"G-S_English" : 3,
 }
+
+#reader
+READER_PATH = "byteReader"
+READER_NAME = "reader"

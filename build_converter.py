@@ -8,9 +8,11 @@ if not os.path.isdir(BUILD_PATH):
 	os.mkdir(BUILD_PATH)
 
 try:
-	command = f'{CSC_PATH} ' + "".join(
+	command = f'{CSC_PATH} /r:"{CONV_DEPENDENCIES_PATH}/netstandard.dll" '		# compiler, first options and default dependency
+	command += "".join(	#all dependency
 		f'/r:"{CONV_DEPENDENCIES_PATH}/{dependency}" ' for dependency in CONV_DEPENDENCIES
-	) + f'/out:{BUILD_PATH}/{CONV_BUILD_NAME} {CONV_SRC_PATH}'
+	)
+	command += f'/out:{BUILD_PATH}/{CONV_BUILD_NAME} {CONV_SRC_PATH}'
 	retval = os.system(command)
 	if retval != 0:
 		RET_CODE = 1
