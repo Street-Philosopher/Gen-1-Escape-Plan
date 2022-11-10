@@ -10,6 +10,7 @@ except:
 window = tk.Tk()
 window.geometry("256x370")
 
+#TODO: raw per versioni che non usano il setup di ZZAZZ
 def ShowMap():
 	#remove all previous widgets
 	for child in window.winfo_children():

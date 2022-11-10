@@ -201,18 +201,18 @@ final_loop:
 end_fs:
 
 
+; this overwrites the tile data with the data we need
 ; here "D" is used as a counter for the tiles we still have to overwrite
 ; "HL" contains the VRAM address containing sprite data, the one we'll need to overwrite
 ; "BC" contains the address containing box data
 ; "E" is also used as a counter. it counts the number of bytes in each tile (8)
-; this overwrites the tile data with our data
 overwriteStuff:
 IF VERSION == GS_EN
-	; turn on SRAM, because in GSC box data is stored there
-	ld a,1
-	ld [$6000],a
+	; in GSC box data is stored in SRAM, so turn it on so we can read it
 	ld a,$0A
 	ld [$0000],a
+	ld a,1
+	ld [$6000],a		; TODO: experiment with this
 	ld a,1
 	ld [$4000],a
 ENDC
@@ -248,7 +248,7 @@ overwriteStuffLoop:
 ; overwrites the white and black tiles of the frame to be full-white or full-black
 	; ld A,$FF is not needed because we loaded above
 overwrite_5455:
-	; ld C,$10 is done with the paired loop above. the second time we write $100 bytes but its ok because we overwrite unused tiles
+	; ld C,$10 is done with the paired loop above. since we don't load, the second time we write $100 bytes instead of $10 (the counter starts at $00) but its ok because we overwrite unused tiles
 loop1:				; write 16 (size in bytes of a tile) times ff to create black tile, then adds one to write 00, which creates white tile. this way i don't have to rewrite the function
 	ldi [HL],A
 	dec C
@@ -261,6 +261,7 @@ loop1:				; write 16 (size in bytes of a tile) times ff to create black tile, th
 end_overwrite:
 
 
+; reset any important states and return
 IF VERSION == RB_EN || VERSION == RB_EU
 	; turn the screen back on but keep sprites disabled
 	ld A,$E1

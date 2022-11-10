@@ -65,5 +65,6 @@ finally:
 			os.remove(file)
 
 print("all finished!\n")
-os.system("/bin/bash -c 'read -s -n 1 -p \"Press any key to continue...\n\"'" if os.name == "posix" else "pause")
+# /bin/bash -c 'read -s -n 1 -p \"Press any key to continue...\n\"'
+os.system("" if os.name == "posix" else "pause")
 exit(RET_CODE)

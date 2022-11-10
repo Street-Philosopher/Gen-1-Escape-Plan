@@ -57,6 +57,7 @@ except Exception as e:
 #don't ask for input, if this is called from build_all it will have a parameter
 import sys
 if len(sys.argv) == 1:
-	os.system("/bin/bash -c 'read -s -n 1 -p \"Press any key to continue...\n\"'" if os.name == "posix" else "pause")
+	# /bin/bash -c 'read -s -n 1 -p \"Press any key to continue...\n\"'
+	os.system("" if os.name == "posix" else "pause")
 
 exit(RET_CODE)
