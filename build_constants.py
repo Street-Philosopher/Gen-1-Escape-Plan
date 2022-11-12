@@ -9,8 +9,8 @@ CSC_PATH  = "mcs"      if _osname == "posix" else "csc.exe"
 ASM_PATH  = "rgbasm"
 LINK_PATH = "rgblink"
 
-CONVERTER_FOLDER = "monconverter"
-PAYLOAD_FOLDER   = "bytes"
+CONVERTER_BUILD_FOLDER = "monconverter"
+PAYLOAD_BUILD_FOLDER   = "bytes"
 
 # converter stuff
 CONV_BUILD_NAME = "converter" if _osname == "posix" else "converter.exe"

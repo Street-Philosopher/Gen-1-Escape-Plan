@@ -18,26 +18,26 @@ try:
 
 	print("\n")
 	print("moving everything in a folder...")
-	os.mkdir (f"{BUILD_PATH}/{CONVERTER_FOLDER}")
-	os.mkdir (f"{BUILD_PATH}/{PAYLOAD_FOLDER}")
-	os.mkdir (f"{BUILD_PATH}/{PAYLOAD_FOLDER}/res")
+	os.mkdir (f"{BUILD_PATH}/{CONVERTER_BUILD_FOLDER}")
+	os.mkdir (f"{BUILD_PATH}/{PAYLOAD_BUILD_FOLDER}")
+	os.mkdir (f"{BUILD_PATH}/{PAYLOAD_BUILD_FOLDER}/res")
 
-	os.rename(f"{BUILD_PATH}/{CONV_BUILD_NAME}", f"{BUILD_PATH}/{CONVERTER_FOLDER}/{CONV_BUILD_NAME}")
+	os.rename(f"{BUILD_PATH}/{CONV_BUILD_NAME}", f"{BUILD_PATH}/{CONVERTER_BUILD_FOLDER}/{CONV_BUILD_NAME}")
 	for dependency in CONV_DEPENDENCIES:
-		shutil.copyfile(f"{CONV_DEPENDENCIES_PATH}/{dependency}", f'{BUILD_PATH}/{CONVERTER_FOLDER}/{dependency}')
+		shutil.copyfile(f"{CONV_DEPENDENCIES_PATH}/{dependency}", f'{BUILD_PATH}/{CONVERTER_BUILD_FOLDER}/{dependency}')
 
 	#copy py script into pyw
-	shutil.copyfile(f"{READER_PATH}/{READER_NAME}.py", f"{BUILD_PATH}/{PAYLOAD_FOLDER}/{READER_NAME}.pyw")
+	shutil.copyfile(f"{READER_PATH}/{READER_NAME}.py", f"{BUILD_PATH}/{PAYLOAD_BUILD_FOLDER}/{READER_NAME}.pyw")
 	#copy bytes files
 	for file in glob.glob(f"{BUILD_PATH}/*.txt"):
-		os.rename(file, f"{BUILD_PATH}/{PAYLOAD_FOLDER}/res/{os.path.basename(file)}")
+		os.rename(file, f"{BUILD_PATH}/{PAYLOAD_BUILD_FOLDER}/res/{os.path.basename(file)}")
 	#copy any asset
 	for file in glob.glob("{READER_PATH}/res/*"):
-		shutil.copyfile(file, f"{BUILD_PATH}/{PAYLOAD_FOLDER}/res/{os.path.basename(file)}")
+		shutil.copyfile(file, f"{BUILD_PATH}/{PAYLOAD_BUILD_FOLDER}/res/{os.path.basename(file)}")
 
 	print("zipping...")
-	shutil.make_archive(f"{BUILD_PATH}/{CONVERTER_FOLDER}", 'zip', f"{BUILD_PATH}/{CONVERTER_FOLDER}")
-	shutil.make_archive(f"{BUILD_PATH}/{PAYLOAD_FOLDER}",   'zip', f"{BUILD_PATH}/{PAYLOAD_FOLDER}")
+	shutil.make_archive(f"{BUILD_PATH}/{CONVERTER_BUILD_FOLDER}", 'zip', f"{BUILD_PATH}/{CONVERTER_BUILD_FOLDER}")
+	shutil.make_archive(f"{BUILD_PATH}/{PAYLOAD_BUILD_FOLDER}",   'zip', f"{BUILD_PATH}/{PAYLOAD_BUILD_FOLDER}")
 
 	print("done!")
 	RET_CODE = 0
@@ -48,15 +48,15 @@ finally:
 	print("cleaning up build files")
 	files_for_cleanup = [
 		f"{BUILD_PATH}/{CONV_BUILD_NAME}",
-		f"{BUILD_PATH}/{CONVERTER_FOLDER}/{CONV_BUILD_NAME}",
-		f"{BUILD_PATH}/{PAYLOAD_FOLDER}/{READER_NAME}.pyw"
+		f"{BUILD_PATH}/{CONVERTER_BUILD_FOLDER}/{CONV_BUILD_NAME}",
+		f"{BUILD_PATH}/{PAYLOAD_BUILD_FOLDER}/{READER_NAME}.pyw"
 	]
-	files_for_cleanup += glob.glob(f"{BUILD_PATH}/{PAYLOAD_FOLDER}/res/*.txt") + glob.glob(f"{BUILD_PATH}/*.txt")
-	files_for_cleanup += glob.glob(f"{BUILD_PATH}/{CONVERTER_FOLDER}/*.dll")
+	files_for_cleanup += glob.glob(f"{BUILD_PATH}/{PAYLOAD_BUILD_FOLDER}/res/*.txt") + glob.glob(f"{BUILD_PATH}/*.txt")
+	files_for_cleanup += glob.glob(f"{BUILD_PATH}/{CONVERTER_BUILD_FOLDER}/*.dll")
 	dirs_for_cleanup = [
-		f"{BUILD_PATH}/{CONVERTER_FOLDER}",
-		f"{BUILD_PATH}/{PAYLOAD_FOLDER}/res",
-		f"{BUILD_PATH}/{PAYLOAD_FOLDER}"
+		f"{BUILD_PATH}/{CONVERTER_BUILD_FOLDER}",
+		f"{BUILD_PATH}/{PAYLOAD_BUILD_FOLDER}/res",
+		f"{BUILD_PATH}/{PAYLOAD_BUILD_FOLDER}"
 	]
 	for file in files_for_cleanup:
 		if os.path.isfile(file):

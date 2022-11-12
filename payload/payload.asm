@@ -1,5 +1,6 @@
 ; i'm sorry to whoever wants to read this code
 
+; version numbers (used for conditional compiling)
 RB_EN = 1
 RB_EU = 2
 GS_EN = 3
@@ -42,7 +43,10 @@ ELSE
 	FAIL "Invalid build version"
 ENDC
 
-; preparation before changing stuff
+
+
+PREPARATION:
+; disable interrupts and turn off the LCD
 	di
 VBlankCheck:
 	ldh A,[$44]	 	; vertical position of scanline
@@ -53,8 +57,10 @@ VBlankCheck:
 
 	; xor A,A not needed
 	ldh [$40],A		; turn off LCD
-; end of prep
 
+
+
+OVERWRITE_MAP_DATA:
 ; this will overwrite the current map data to show on screen a frame (black and white) containing all different tiles
 ; "HL" will hold the VRAM address containing current tile data, so we can overwrite the map at our likings
 ; "C" is the tile number we want to write next
@@ -74,7 +80,6 @@ VBlankCheck:
 ;	WDDDDWWWWWWW
 ;	WWWWWWWWWWWW
 ;
-fillScreen:
 	ld HL,MAP_DATA
 IF VERSION == RB_EN || VERSION == RB_EU
 	ld BC,$640C
@@ -198,15 +203,15 @@ final_loop:
 	ldi [HL],A
 	dec C
 	jr nz,final_loop
-end_fs:
 
 
+
+OVERWRITE_TILE_DATA:
 ; this overwrites the tile data with the data we need
 ; here "D" is used as a counter for the tiles we still have to overwrite
 ; "HL" contains the VRAM address containing sprite data, the one we'll need to overwrite
 ; "BC" contains the address containing box data
 ; "E" is also used as a counter. it counts the number of bytes in each tile (8)
-overwriteStuff:
 IF VERSION == GS_EN
 	; in GSC box data is stored in SRAM, so turn it on so we can read it
 	ld a,$0A
@@ -234,10 +239,10 @@ overwriteStuffLoop:
 	jr nz,overwriteStuffLoop2	; will loop for every tile in the code
 
 	; an entire column will be just for the number. this saves three bytes
-	writeMonNumber:
+writeMonNumber:
 	ld BC,$0810
 	; ld B,8
-	wmn_black_loop:
+wmn_black_loop:
 	ld A,[MON_NUMBER]	; TODO: this is an immediate. maybe moving it before everything else and adding instead of loading will do something
 	ldi [HL],A
 	ld A,$FF
@@ -245,7 +250,7 @@ overwriteStuffLoop:
 	dec B
 	jr nz,wmn_black_loop
 
-; overwrites the white and black tiles of the frame to be full-white or full-black
+	; overwrites the white and black tiles of the frame to be full-white or full-black
 	; ld A,$FF is not needed because we loaded above
 overwrite_5455:
 	; ld C,$10 is done with the paired loop above. since we don't load, the second time we write $100 bytes instead of $10 (the counter starts at $00) but its ok because we overwrite unused tiles
@@ -253,14 +258,15 @@ loop1:				; write 16 (size in bytes of a tile) times ff to create black tile, th
 	ldi [HL],A
 	dec C
 	jr nz,loop1
-	
+
 	; adds one, and jumps back to the start if there was an overflow (a=0). this way we only jump the first time (a=$FF), AND we get the correct value for "a" to write
 	; O P T I M I S A T I O N S
 	inc A
 	jr z,overwrite_5455
-end_overwrite:
 
 
+
+CLEANUP:
 ; reset any important states and return
 IF VERSION == RB_EN || VERSION == RB_EU
 	; turn the screen back on but keep sprites disabled
@@ -268,10 +274,11 @@ IF VERSION == RB_EN || VERSION == RB_EU
 	ldh [$40],A
 ELIF VERSION == GS_EN
 	; turn SRAM back off and re-enable LCD with no sprites. uses different LCD settings 
-	; A is already zero, so 'xor A,A' is not necessary
+	; A is already zero from the previous thing, so 'xor A,A' is not necessary
 	ld [$0000],A
 	ld A,$E3
 	ldh [$40],A
 ENDC
-	
+	; re-enable interrupts and return
 	reti
+
