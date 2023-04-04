@@ -49,7 +49,6 @@ ENDC
 
 PREPARATION:
 ; disable interrupts and turn off the LCD
-	
 	di
 VBlankCheck:
 	ldh A,[$44]	 	; vertical position of scanline
