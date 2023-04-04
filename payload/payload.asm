@@ -60,6 +60,15 @@ VBlankCheck:
 
 	; load zero into the LCD settings which, among other things, turns off the LCD
 	ldh [$40],A
+; another, easier to undrstand but les optimised, version of this code would be:
+; loop:
+;	ldh A,[$44]
+;	cp A, VBLANK_START
+;	jr nz,loop
+;
+;	ld A, 0x00
+;	ldh [$40],A
+; this does the same thing but takes two extra bytes
 
 
 
