@@ -269,12 +269,12 @@ loop1:				; write 16 (size in bytes of a tile) times ff to create black tile, th
 CLEANUP:
 ; reset any important states and return
 IF VERSION == RB_EN || VERSION == RB_EU
-	; turn the screen back on but keep sprites disabled
+	; turn the screen back on but keep sprites disabled, so the only thing we see is the background we turned into the code
 	ld A,$E1
 	ldh [$40],A
 ELIF VERSION == GS_EN
-	; turn SRAM back off and re-enable LCD with no sprites. uses different LCD settings 
-	; A is already zero from the previous thing, so 'xor A,A' is not necessary
+	; turn SRAM back off and re-enable LCD with no sprites. this version uses slightly different LCD settings than the one above
+	; A is already zero from the previous operation, so 'xor A,A' is not necessary
 	ld [$0000],A
 	ld A,$E3
 	ldh [$40],A
