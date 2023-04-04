@@ -10,13 +10,15 @@ IF DEF(VERSION) == 0
 	FAIL "No build specified"
 ENDC
 
-SECTION "", ROM0	; RGBASM doesn't let me do cool things so I have to put this here
+; needed for it to compile. this section will be placed in WRAM at address 0xD901
+; we don't really care since we only use relative jumps, but still
+SECTION "", ROM0
 LOAD "main", WRAMX[$D901]
 
 ; TODO: this could be maybe potentially be optimised by removing all the $FF when writing to VRAM which would also double the information density, which would require a rewrite of the program
 ; i don't know if you can notice the slow realisation that the idea is not that easy after all, in the comment above
 
-; first box
+; the program reads data for the currently active box
 ; (33*20) + 1 bytes of information
 
 ; program constants
@@ -47,16 +49,18 @@ ENDC
 
 PREPARATION:
 ; disable interrupts and turn off the LCD
+	
 	di
 VBlankCheck:
 	ldh A,[$44]	 	; vertical position of scanline
 	; CP is just SUB, except it doesn't store a result. we are checking when A-$91 == 0.
-	; since we need to set A to zero afterwards anyways we can use SUB, which does the same AND stores the result (zero)
+	; since we need to set A to zero afterwards anyways we can use SUB, which does the same of CP (sets the correct flags) AND stores the result (zero, when the comparison succeeds)
 	sub A, VBLANK_START
+	; redo the check if it failed. repeat until we get in vblank
 	jr nz,VBlankCheck
 
-	; xor A,A not needed
-	ldh [$40],A		; turn off LCD
+	; load zero into the LCD settings which, among other things, turns off the LCD
+	ldh [$40],A
 
 
 
