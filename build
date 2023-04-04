@@ -193,6 +193,9 @@ match argv[1]:
 		build_converter()
 	case "all":
 		build_all()
+	case "clear":
+		for f in glob.glob(BUILD_PATH + "/*"):
+			os.remove(f)
 	case _:
-		print("invalid options; must be one of:\n\t- asm\n\t- conv\n\t- all")
+		print("invalid option; must be one of:\n\t- asm\n\t- conv\n\t- all")
 

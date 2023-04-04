@@ -10,6 +10,8 @@ IF DEF(VERSION) == 0
 	FAIL "No build specified"
 ENDC
 
+INCLUDE "./payload/hardware.inc"
+
 ; needed for it to compile. this section will be placed in WRAM at address 0xD901
 ; we don't really care since we only use relative jumps, but still
 SECTION "", ROM0
@@ -51,7 +53,7 @@ PREPARATION:
 ; disable interrupts and turn off the LCD
 	di
 VBlankCheck:
-	ldh A,[$44]	 	; vertical position of scanline
+	ldh A,[rLY]	 	; vertical position of scanline
 	; CP is just SUB, except it doesn't store a result. we are checking when A-$91 == 0.
 	; since we need to set A to zero afterwards anyways we can use SUB, which does the same of CP (sets the correct flags) AND stores the result (zero, when the comparison succeeds)
 	sub A, VBLANK_START
@@ -59,7 +61,7 @@ VBlankCheck:
 	jr nz,VBlankCheck
 
 	; load zero into the LCD settings which, among other things, turns off the LCD
-	ldh [$40],A
+	ldh [rLCDC],A
 ; another, easier to undrstand but les optimised, version of this code would be:
 ; loop:
 ;	ldh A,[$44]
@@ -68,7 +70,7 @@ VBlankCheck:
 ;
 ;	ld A, 0x00
 ;	ldh [$40],A
-; this does the same thing but takes two extra bytes
+; this version does the same thing but takes two extra bytes
 
 
 
@@ -226,12 +228,12 @@ OVERWRITE_TILE_DATA:
 ; "E" is also used as a counter. it counts the number of bytes in each tile (8)
 IF VERSION == GS_EN
 	; in GSC box data is stored in SRAM, so turn it on so we can read it
-	ld a,$0A
-	ld [$0000],a
-	ld a,1
-	ld [$6000],a		; TODO: experiment with this
-	ld a,1
-	ld [$4000],a
+	ld A,$0A
+	ld [rRAMG],A
+	ld A,1
+	ld [$6000],A
+	ld A,1
+	ld [rRAMB],A
 ENDC
 
 	ld D,TILES_TO_WRITE			; including 0
@@ -283,13 +285,13 @@ CLEANUP:
 IF VERSION == RB_EN || VERSION == RB_EU
 	; turn the screen back on but keep sprites disabled, so the only thing we see is the background we turned into the code
 	ld A,$E1
-	ldh [$40],A
+	ldh [rLCDC],A
 ELIF VERSION == GS_EN
 	; turn SRAM back off and re-enable LCD with no sprites. this version uses slightly different LCD settings than the one above
 	; A is already zero from the previous operation, so 'xor A,A' is not necessary
-	ld [$0000],A
+	ld [rRAMG],A
 	ld A,$E3
-	ldh [$40],A
+	ldh [rLCDC],A
 ENDC
 	; re-enable interrupts and return
 	reti
