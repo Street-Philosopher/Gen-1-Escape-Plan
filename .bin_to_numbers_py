@@ -1,0 +1,27 @@
+
+
+# with open(FILENAME, "r") as FILE:
+# 	linecountr = 0
+# 	bincountr = 0
+
+# 	for line in FILE:
+# 		linecountr += 1
+
+# 		line = line.strip().replace("\n", "")
+
+# 		if line == "" or line.startswith("#"):
+# 			continue
+
+# 		else:
+# 			bincountr += 1
+
+# 			try:
+# 				res = int(line, base=2)
+# 				# print(res)
+# 			except Exception as e:
+# 				print(f"couldn't read line {linecountr}:", e)
+# 				exit(-1)
+
+# print("total:", bincountr)
+
+# exit(0)

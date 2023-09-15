@@ -10,7 +10,7 @@ IF DEF(VERSION) == 0
 	FAIL "No build specified"
 ENDC
 
-INCLUDE "./payload/hardware.inc"
+INCLUDE "./payload/hardware.asm"
 
 ; needed for it to compile. this section will be placed in WRAM at address 0xD901
 ; we don't really care since we only use relative jumps, but still
@@ -52,25 +52,25 @@ ENDC
 PREPARATION:
 ; disable interrupts and turn off the LCD
 	di
-VBlankCheck:
+wait_vblank:
 	ldh A,[rLY]	 	; vertical position of scanline
 	; CP is just SUB, except it doesn't store a result. we are checking when A-$91 == 0.
 	; since we need to set A to zero afterwards anyways we can use SUB, which does the same of CP (sets the correct flags) AND stores the result (zero, when the comparison succeeds)
 	sub A, VBLANK_START
 	; redo the check if it failed. repeat until we get in vblank
-	jr nz,VBlankCheck
+	jr nz,wait_vblank
 
 	; load zero into the LCD settings which, among other things, turns off the LCD
 	ldh [rLCDC],A
-; another, easier to undrstand but les optimised, version of this code would be:
-; loop:
-;	ldh A,[$44]
-;	cp A, VBLANK_START
-;	jr nz,loop
+; another, easier to understand but less optimised, version of this code would be:
+; 	wait_vblank:
+;		ldh A, [rLY]
+;		cp A,  VBLANK_START
+;		jr nz, wait_vblank
 ;
-;	ld A, 0x00
-;	ldh [$40],A
-; this version does the same thing but takes two extra bytes
+;		ld A, 0x00
+;		ldh [rLCDC],A
+; this second version does the same thing, but takes two extra bytes
 
 
 
@@ -94,7 +94,6 @@ OVERWRITE_MAP_DATA:
 ;	WDDDDWWWWWWW
 ;	WWWWWWWWWWWW
 ;
-	ld HL,MAP_DATA
 IF VERSION == RB_EN || VERSION == RB_EU
 	ld BC,$640C
 	; ld B,$64			; to make the code centered in the screen, and to compensate for off-screen tiles
@@ -104,13 +103,14 @@ ELIF VERSION == GS_EN
 	; ld B,$84
 	; ld C,$0C
 ENDC
+	ld HL,MAP_DATA
 	ld A,BLACK_SQUARE
 fs_loop1:				; start by adding black squares to make the frame
 	ldi [HL],A
 	dec B
 	jr nz,fs_loop1
 	; draws top line of frame
-	inc A	; equivalent to "ld A,WHITE_SQUARE", bc WHITE_SQUARE is BLACK_SQUARE + 1
+	inc A	; equivalent to "ld A,WHITE_SQUARE", because WHITE_SQUARE is BLACK_SQUARE + 1
 fs_loop2:
 	ldi [HL],A
 	dec C
@@ -179,12 +179,12 @@ fs_loop7:						; since we only have 4 data tiles, we fill the other 6 tiles in t
 	; last new line
 	dec A		; ld A,BLACK_SQUARE
 fs_loop8:
-	ldi [hl],a
-	dec c
+	ldi [HL],A
+	dec C
 	jr nz,fs_loop8
 	
 	; bottom row of the frame
-	ld bc,$0C84
+	ld BC,$0C84
 	; ld B,12
 	; ld C,$84
 	inc A; ld a,WHITE_SQUARE
@@ -195,7 +195,7 @@ fs_loop69:
 	; after the white frame, we cover the rest of the screen with black tiles
 
 ELIF VERSION == GS_EN
-	ld bc,$1484
+	ld BC,$1484
 	; ld B,14
 	; ld C,0x84
 fs_loop69:
@@ -203,11 +203,11 @@ fs_loop69:
 	dec B
 	jr nz,fs_loop69
 
-	ld b,12
+	ld B,12
 	inc A;ld A,WHITE_SQUARE
 fs_loop_idk:
-	ldi [hl],a
-	dec b
+	ldi [HL],A
+	dec B
 	jr nz,fs_loop_idk
 ENDC
 	
