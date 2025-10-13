@@ -190,7 +190,7 @@ def build_all():
 # start of actual program
 from sys import argv
 if len(argv) == 1:
-    argv += ["all"]
+    argv += ["asm"]
 match argv[1]:
 	case "asm":
 		build_payload()

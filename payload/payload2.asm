@@ -40,6 +40,13 @@ ELSE
 	FAIL "Invalid build version"
 ENDC
 
+; simplified version since we don't have the full symbol table
+MACRO farcall
+	ld b, 1
+	ld hl,\1
+	call BankSwitch
+ENDM
+
 ; we don't have push with 8b regs so here's a simple workaround (we push the 16bit equivalent, then go back by one)
 ; not actually used but felt like leaving it here bc i like it for some reason
 MACRO pusha
@@ -97,7 +104,7 @@ ENDM
 
 ; init
 ld hl,BOX_DATA
-ld c,11
+ld c,11+1			; the +2 is for easier alignment later. this way we end up PUSHing 48 chars (=> 96 bytes)
 
 charloop:
 ; first char
@@ -145,20 +152,34 @@ push af
 dec c
 jr nz, charloop
 
-; temp print func
+print_string:
 ld hl, RANDOM_ADDRESS_TO_OVERWRITE
+xor a							; \__ string initiator
+ld [hli], a						; /
+
+ld b,3							; \
+printloop_pt2:					; |---- 3 lines, 16 chars each
+ld c,16							; /
+
 printloop:
-pop af
-add a,$80
-ld [hli],a
+pop af							; \
+add a,$80						; |--- get the char off the stack, convert it to a printable, and put it on the string
+ld [hli],a						; /
 dec c
 jr nz,printloop
-ld a,TEXT_END
+
+ld a, NEWLINE
+ld [hli],a
+dec b
+jr nz printloop_pt2
+
+ld a,TEXT_END					; TODO: maybe just change the last NEWLINE to this by addition
 ld [hli],a
 
 ; assembled instructions (placed at d901) 3E01E08C0601219670CDD6352114D9CD493CC9
 ldh [hTextID],x					; FF8C
 farcall DisplayTextIDInit		; ld b,1; ld hl,$7096; call 35D6 (need to check argument (0 is ID for start menu))
+ld hl,RANDOM_ADDRESS_TO_OVERWRITE
 call PrintText
 ret
 
