@@ -1,9 +1,9 @@
 ; i'm sorry to whoever wants to read this code
 
 ; version numbers (used for conditional compiling)
-RB_EN = 1
-RB_EU = 2
-GS_EN = 3
+DEF RB_EN = 1
+DEF RB_EU = 2
+DEF GS_EN = 3
 
 ; fail if no version is specified
 IF DEF(VERSION) == 0
@@ -24,16 +24,16 @@ LOAD "main", WRAMX[$D901]
 ; (33*20) + 1 bytes of information
 
 ; program constants
-TILES_TO_WRITE = $53
-BLACK_SQUARE   = TILES_TO_WRITE + 1 ; index in memory of the full black tile
-WHITE_SQUARE   = BLACK_SQUARE + 1   ; index in memory of the full white tile
+DEF TILES_TO_WRITE = $53
+DEF BLACK_SQUARE   = TILES_TO_WRITE + 1 ; index in memory of the full black tile
+DEF WHITE_SQUARE   = BLACK_SQUARE + 1   ; index in memory of the full white tile
 
 ; other constants
-VBLANK_START = $91
+DEF VBLANK_START = $91
 
 ; memory addresses
-TILE_DATA = $9000
-MAP_DATA  = $9800
+DEF TILE_DATA = $9000
+DEF MAP_DATA  = $9800
 IF   VERSION == RB_EN
 	def BOX_DATA   = $DA96
 	def MON_NUMBER = $DA80
