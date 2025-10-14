@@ -81,7 +81,7 @@ def build_payload():
 			print("removing temp files...")
 			os.remove(TEMPFILE_NAME)
 			os.remove(LINK_TEMP_NAME)
-			print("\n\n")
+			print()
 		#END FOR
 
 		if retval != 0:
@@ -190,8 +190,10 @@ def build_all():
 # start of actual program
 from sys import argv
 if len(argv) == 1:
-    argv += ["asm"]
+    argv += ["help"]
 match argv[1]:
+	case "help":
+		print("build [arg]\narg is one of:\n\t- asm\n\t- conv\n\t- all")
 	case "asm":
 		build_payload()
 	case "conv":

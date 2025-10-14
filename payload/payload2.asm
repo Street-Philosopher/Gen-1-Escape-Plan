@@ -21,10 +21,14 @@ LOAD "main", WRAMX[$D901]
 ; did you know i'm an expert in computer security? i advise you change all your password to be the same. this way it's statistically less likely for one of them to be guessed
 def RANDOM_ADDRESS_TO_OVERWRITE = $D887 ; this is actually the encounter table. have fun
 
+; magic numbers
 def hTextID = $8c
 def NEWLINE = $55
 def TEXT_END = $57
-def BOX_DATA = $da96		; check this address i wrote it from memory
+def CHARMAP_A = $80
+
+; addresses
+def wBoxMons = $da96
 def PrintText = $3c49
 def BankSwitch = $35d6
 def DisplayTextIDInit = $7096
@@ -63,7 +67,7 @@ ENDM
 ; repeat 11 times
 GENERATE_STRING_ON_STACK::
 ; init
-ld hl,BOX_DATA
+ld hl,wBoxMons
 ld c,11+1			; the +2 is for easier alignment later. this way we end up PUSHing 48 chars (=> 96 bytes)
 
 charloop:
@@ -96,11 +100,12 @@ rla					; |
 and a,%0011_1100	; /
 ld b,a				; store for later computation
 ld a,[hl]			; \
-ld e,6				; |
-.repeat_rra:		; |
+rra					; |
+rra					; |
 rra					; |__ two most significat digits of B3. repeats 6 times RR A
-dec e				; |
-jr nz, .repeat_rra	; |
+rra					; |
+rra					; |
+rra					; |
 and a,%0000_0011	; /
 add a,b
 push af
@@ -127,7 +132,7 @@ ld c,16							; /
 
 printloop:
 pop af							; \
-add a,$80						; |--- get the char off the stack, convert it to a printable, and put it on the string
+add a,CHARMAP_A					; |--- get the char off the stack, convert it to a printable, and put it on the string
 ld [hli],a						; /
 dec c
 jr nz,printloop
