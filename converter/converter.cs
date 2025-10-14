@@ -6,6 +6,11 @@ namespace byteToPk1
 {
 	class converter
 	{
+		static void DecodeFromString(string arg) {
+			const int monSize = 33;
+
+		}
+
 		//last 12 bytes are useless, except last one that contains the number of nums to decode
 		static void Main(string[] args)
 		{

@@ -13,24 +13,24 @@ ENDC
 
 INCLUDE "./payload/hardware.asm"
 
-; needed for it to compile. this section will be placed in WRAM at address 0xD901
-; we don't really care since we only use relative jumps, but still
 SECTION "", ROM0
-LOAD "main", WRAMX[$D901]
+; LOAD "main", WRAMX[$D901]
 
 ; did you know i'm an expert in computer security? i advise you change all your password to be the same. this way it's statistically less likely for one of them to be guessed
-def RANDOM_ADDRESS_TO_OVERWRITE = $D887 ; this is actually the encounter table. have fun
+def random_addr_to_overwrite = $D887 ; this is actually the encounter table. have fun
 
 ; magic numbers
 def hTextID = $8c
-def NEWLINE = $55
-def TEXT_END = $57
-def CHARMAP_A = $80
+def letter_a = $80
+def newline_char = $55
+def terminator_char = $57
 
 ; addresses
-def wBoxMons = $da96
-def PrintText = $3c49
-def BankSwitch = $35d6
+def wBoxMons = $DA96
+def PrintText = $3C49
+def BankSwitch = $35D6
+def YesNoChoice = $35EC
+def wCurrentMenuItem = $CC26
 def DisplayTextIDInit = $7096
 
 
@@ -54,7 +54,17 @@ ENDM
 
 
 
-; TODO: by PUSHing the PC we could see where we are and thus change the starting address of the copied data to go to the next pkmn, regardless of implementation
+; alr dumb idea time
+; we don't have any direct way to interact with PC, so we can't really store its value for later use
+; we can't CALL other parts of the program either, as that would require us to have an _absolute jump_ and we'd thus need to know where we are placing the program in memory
+; this is bad bc my guiding principle is that you should be able to use this payload regardless of setup (and thus regardless of memory address)
+; the RST vectors aren't useful either as they just call themselves without ever returning
+; BUT there's a single interrupt in the header which simply RETurns as soon as it is called. thus we can push the PC on the stack this way
+; (could've just as well JPed to any RET in ROM, but i prefer this tbh)
+BEGINNING::
+call $0060
+dec sp
+dec sp
 
 ; a pkmn is made of 33B. we have 64 possible characters => 6b of info => need to print ceil(33 * 8 / 6) = 44 characters
 ; B1: aaaaaabb
@@ -121,8 +131,8 @@ jr nz, charloop
 ; 4F (next characters)		; we skip this line. looks ugly but works
 ; 55 (next characters, repeat this last line as needed)
 ; 57 (string terminator that asks for button press)
-print_string:
-ld hl, RANDOM_ADDRESS_TO_OVERWRITE
+PRINT_STRING::
+ld hl, random_addr_to_overwrite
 xor a							; \__ string initiator
 ld [hli], a						; /
 
@@ -132,37 +142,52 @@ ld c,16							; /
 
 printloop:
 pop af							; \
-add a,CHARMAP_A					; |--- get the char off the stack, convert it to a printable, and put it on the string
+add a,letter_a					; |--- get the char off the stack, convert it to a printable, and put it on the string
 ld [hli],a						; /
 dec c
 jr nz,printloop
 
-ld a, NEWLINE
+ld a, newline_char
 ld [hli],a
 dec b
 jr nz, printloop_pt2
 
-ld a,TEXT_END					; TODO: maybe just change the last NEWLINE to this by addition
+ld a,terminator_char					; TODO: maybe just change the last newline_char to this by addition
 ld [hli],a
 
 
-
-; engine calls
+ENGINE_CALLS::
 ld a,1
 ldh [hTextID],a						; FF8C
-farcall DisplayTextIDInit			; ld b,1; ld hl,$7096; call 35D6 (need to check argument (0 is ID for start menu))
-ld hl,RANDOM_ADDRESS_TO_OVERWRITE
+farcall DisplayTextIDInit			; call a function outside of the current ROM bank (need to check argument (0 is ID for start menu))
+ld hl,random_addr_to_overwrite
 call PrintText						; 3C49
+
+; ask for next pokemon
+call YesNoChoice
+ld a, [wCurrentMenuItem]
+
+; get back the PC we PUSHed on the stack at the beginning of the program
+; do it here so that we do it regardless of outcome of yes/no
+; if outcome is no we can just not use it and return it, if it is yea we use it
+pop hl
+
+; if YesNoChoice == 0 return
+and a
+ret nz
+
+; if YesNoChoice == 1
+; ahhh self-modifying code. what could go wrong?
+; first, calculate the address of the byte to modify into HL. then 16bit-add 33 (size of one mon in the box) to it
+ld bc, (GENERATE_STRING_ON_STACK - BEGINNING) - 2		; \___ HL (= start of the program) += (difference between start of the program and address of mon data, that we luckily only use once)
+add hl, bc												; /
+
+ld a,33					; 
+ld b, [hl]				; word x = *HL
+add a,b					; low(x) += 33 (number of bytes for one pokemon in the box)
+ld [hli],a				; store changed value of HL
+ret nc					; if there wasn't an overflow we dont need to do any further operations
+inc [hl]				; if there _was_ an overflow, we increment the most significant byte by one to account for that. we already moved the pointer to it with the LD [hli], a
+
 ret
-
-
-; METODO 1,5: fare tutto in HL? (o in un altro regsitro 16b)
-; DE <- primo byte /\ secondo byte
-; char = D & 0b1111_1100
-; now DE is equal to aaaaaabb_bbbbcccc
-; DE << 2
-; E = byte successivo
-; DE << 4
-; ripeti da assegnazione a char
-
 
