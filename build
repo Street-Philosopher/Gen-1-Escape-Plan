@@ -27,7 +27,7 @@ CONV_SRC_PATH = f"converter/converter.cs"
 #payload stuff
 ASM_ARGS  = ""			#"-gbz80 -nocase -chklabels -dotdir -Fbin"
 LINK_ARGS = "-x"
-PAYLOAD_SRC_PATH = "payload/payload2.asm"
+PAYLOAD_SRC_PATH = "payload/payload.asm"
 PAYLOAD_BUILDS = {
 	"R-B_English" : 1,
 	# "R-B_Europe"  : 2,
