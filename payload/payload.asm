@@ -24,7 +24,7 @@ SECTION "", ROM0
 ; LOAD "main", WRAMX[$D901]
 
 ; did you know i'm an expert in computer security? i advise you change all your password to be the same. this way it's statistically less likely for one of them to be guessed
-def random_addr_to_overwrite = $D887 ; this is actually the encounter table. have fun
+def random_addr_to_overwrite = $D888 ; this is actually the encounter table. have fun
 
 ; magic numbers
 def hTextID = $8c

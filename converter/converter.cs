@@ -11,14 +11,22 @@ namespace byteToPk1
 		static void Main(string[] args)
 		{
 			//"lGqaAUQGZmrsAAAAAAAAAAAAAAS(DU'sAA'lyNxuBAGAAU(CAU";
-
-			Console.WriteLine("Insert your 48-character string and then hit enter:");
-			var str = Console.ReadLine();
-
-			var data = DecodeMonDataFromString(str);
-			Console.WriteLine("\nWhere do you want your files to be saved? (path)");
+			Console.WriteLine("Where do you want your files to be saved? (path)");
 			var path = Console.ReadLine();
 			Console.WriteLine();
+
+			reset:
+
+			Console.WriteLine("\nInsert your 48-character string and then hit enter:");
+			var str = Console.ReadLine();
+
+			byte[] data;
+			try {
+				data = DecodeMonDataFromString(str);
+			} catch (Exception e) {
+				print("There was an error decoding your string. Please check that you wrote it correctly and then try again.\nError message: " + e.Message);
+				return;
+			}
 
 			// print("decoded the data, now doing the thing");
 
@@ -26,7 +34,10 @@ namespace byteToPk1
 			switch(retcode)
 			{
 				case poke_ok:
-					Console.WriteLine("File written succesfully! Do you want to decode another Pokémon?");
+					Console.WriteLine("File written succesfully! Do you want to decode another Pokémon? (y/n)");
+					if (Console.ReadLine() == "y") {
+						goto reset;
+					}
 					break;
 				case io_error:
 					Console.WriteLine("Couldn't write the file (I/O error)");
@@ -35,99 +46,6 @@ namespace byteToPk1
 					Console.WriteLine("Couldn't decode pokémon: invalid species number.");
 					break;
 			}
-		}
-
-		const int poke_ok = 0;
-		const int io_error = -1;
-		const int invalid_species = -2;
-		static int CreatePokeFileFromData(byte[] data, string path) {
-
-			var mon = new PK1();
-
-			#region Data Decoding
-			//try to set species. if impossible then fuck you // this comment was so unnecessary lol
-			try {
-				mon.Species = SpeciesConverter.GetG1Species(data[0]);
-			}
-			catch {
-				return invalid_species;
-			}
-
-			mon.Move1 = data[08];
-			mon.Move2 = data[09];
-			mon.Move3 = data[10];
-			mon.Move4 = data[11];
-
-			mon.TID = (data[12] * 0x100) + data[13];
-			mon.EXP = ((uint)data[14] * 0x10000) + ((uint)data[15] * 0x100) + data[16];
-
-			mon.EV_HP  = (data[17] * 0x100) + data[18];
-			mon.EV_ATK = (data[19] * 0x100) + data[20];
-			mon.EV_DEF = (data[21] * 0x100) + data[22];
-			mon.EV_SPE = (data[23] * 0x100) + data[24];
-			mon.EV_SPC = (data[25] * 0x100) + data[26];
-
-			mon.IV_ATK = data[27] / 0x10;   //first four bytes are atk iv
-			mon.IV_DEF = data[27] % 0x10;   // last four bytes are def iv
-			mon.IV_SPE = data[28] / 0x10;
-			mon.IV_SPC = data[28] % 0x10;
-
-			//offset 1-2 has current hp. not needed
-			//offset 3 has current level, but we calculate based on experience. not needed
-			//offsets 4-7 have status, types and held items. not needed
-			//offsets 29-32 are PP of moves. not needed
-			#endregion
-
-			#region Last Bits
-			//we don't read the nickname data with everything else because
-			//a: it would require more tiles, and probably wouldn't be able to fit the code in one screen which would make it much harder to program in assembly
-			//b: it would be a nightmare to convert from rb bytes to strings because rb doesn't use ASCII encoding
-			Console.WriteLine("Succesfully decoded " + mon.Nickname + ". Do you want to nickname it? Leave blank for no nickname: ");
-		NNLoop:
-			string nn = Console.ReadLine();
-			if (nn.Length == 0)  //user doesnt want nickname
-			{
-				mon.ClearNickname();
-				mon.SetNotNicknamed();
-			}
-			else if (nn.Length > 12) //nicknames longer than 12 are invalid
-			{
-				Console.WriteLine("Nickname too long. Enter a new one");
-				goto NNLoop;//i dont care what people say, i love gotos
-			}
-			else //user wants a nickname
-			{
-				mon.IsNicknamed = true;
-				mon.Nickname = nn;
-			}
-
-		OTLoop:
-			Console.WriteLine("What's the OT name?");
-			string ot = Console.ReadLine();
-			if (ot.Length == 0 || ot.Length > 7)
-			{
-				Console.WriteLine("Invalid OT. Please retry");
-				goto OTLoop;
-			}
-			mon.OT_Name = ot;
-
-			//i'm not sure what these do but they're probably a good idea
-			mon.FixMoves();
-			mon.Heal();
-			mon.RefreshChecksum();
-			#endregion
-
-			#region File
-			try {
-				File.WriteAllBytes(path + "/" + mon.FileName, mon.DecryptedBoxData);
-			}
-			catch (Exception ex) {
-				Console.WriteLine("I/O error: " + ex);
-				return io_error;
-			}
-			#endregion
-
-			return 0;
 		}
 
 		/// <summary>
@@ -336,6 +254,99 @@ namespace byteToPk1
 			else Console.WriteLine("No pokémon could be decoded. Please check your image and retry.");
 		}
 
+		const int poke_ok = 0;
+		const int io_error = -1;
+		const int invalid_species = -2;
+		static int CreatePokeFileFromData(byte[] data, string path) {
+
+			var mon = new PK1();
+
+			#region Data Decoding
+			//try to set species. if impossible then fuck you // this comment was so unnecessary lol
+			try {
+				mon.Species = SpeciesConverter.GetG1Species(data[0]);
+			}
+			catch {
+				return invalid_species;
+			}
+
+			mon.Move1 = data[08];
+			mon.Move2 = data[09];
+			mon.Move3 = data[10];
+			mon.Move4 = data[11];
+
+			mon.TID = (data[12] * 0x100) + data[13];
+			mon.EXP = ((uint)data[14] * 0x10000) + ((uint)data[15] * 0x100) + data[16];
+
+			mon.EV_HP  = (data[17] * 0x100) + data[18];
+			mon.EV_ATK = (data[19] * 0x100) + data[20];
+			mon.EV_DEF = (data[21] * 0x100) + data[22];
+			mon.EV_SPE = (data[23] * 0x100) + data[24];
+			mon.EV_SPC = (data[25] * 0x100) + data[26];
+
+			mon.IV_ATK = data[27] / 0x10;   //first four bytes are atk iv
+			mon.IV_DEF = data[27] % 0x10;   // last four bytes are def iv
+			mon.IV_SPE = data[28] / 0x10;
+			mon.IV_SPC = data[28] % 0x10;
+
+			//offset 1-2 has current hp. not needed
+			//offset 3 has current level, but we calculate based on experience. not needed
+			//offsets 4-7 have status, types and held items. not needed
+			//offsets 29-32 are PP of moves. not needed
+			#endregion
+
+			#region Last Bits
+			//we don't read the nickname data with everything else because
+			//a: it would require more tiles, and probably wouldn't be able to fit the code in one screen which would make it much harder to program in assembly
+			//b: it would be a nightmare to convert from rb bytes to strings because rb doesn't use ASCII encoding
+			Console.WriteLine("Succesfully decoded " + mon.Nickname + ". Do you want to nickname it? Leave blank for no nickname: ");
+		NNLoop:
+			string nn = Console.ReadLine();
+			if (nn.Length == 0)  //user doesnt want nickname
+			{
+				mon.ClearNickname();
+				mon.SetNotNicknamed();
+			}
+			else if (nn.Length > 12) //nicknames longer than 12 are invalid
+			{
+				Console.WriteLine("Nickname too long. Enter a new one");
+				goto NNLoop;//i dont care what people say, i love gotos
+			}
+			else //user wants a nickname
+			{
+				mon.IsNicknamed = true;
+				mon.Nickname = nn;
+			}
+
+		OTLoop:
+			Console.WriteLine("What's the OT name?");
+			string ot = Console.ReadLine();
+			if (ot.Length == 0 || ot.Length > 7)
+			{
+				Console.WriteLine("Invalid OT. Please retry");
+				goto OTLoop;
+			}
+			mon.OT_Name = ot;
+
+			//i'm not sure what these do but they're probably a good idea
+			mon.FixMoves();
+			mon.Heal();
+			mon.RefreshChecksum();
+			#endregion
+
+			#region File
+			try {
+				File.WriteAllBytes(path + "/" + mon.FileName, mon.DecryptedBoxData);
+			}
+			catch (Exception ex) {
+				Console.WriteLine("I/O error: " + ex);
+				return io_error;
+			}
+			#endregion
+
+			return 0;
+		}
+
 		#region Utilities
 		static void PrintHex(byte b) {
 			Console.WriteLine("{0:X}", b);
@@ -350,5 +361,6 @@ namespace byteToPk1
 			Console.WriteLine(msg);
 		}
 		#endregion
+	
 	}
 }

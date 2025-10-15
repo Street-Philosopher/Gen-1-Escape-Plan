@@ -1,3 +1,5 @@
+# TODO: compile as a standalone app
+
 import os, glob
 import tkinter as tk
 try:
