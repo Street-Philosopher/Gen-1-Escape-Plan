@@ -19,6 +19,7 @@ PAYLOAD_BUILD_FOLDER   = "bytes"
 # converter stuff
 CONV_BUILD_NAME = "converter" if _osname == "posix" else "converter.exe"
 CONV_DEPENDENCIES = [
+	"netstandard.dll",
 	"PKHeX.Core.dll",
 ]
 CONV_DEPENDENCIES_PATH = "converter/dependencies"
@@ -99,7 +100,7 @@ def build_converter():
 		os.mkdir(BUILD_PATH)
 
 	try:
-		command = f'{CSC_PATH} /r:"{CONV_DEPENDENCIES_PATH}/netstandard.dll" '		# compiler, first options and default dependency
+		command = f'{CSC_PATH} '		# compiler
 		command += "".join(	#all dependency
 			f'/r:"{CONV_DEPENDENCIES_PATH}/{dependency}" ' for dependency in CONV_DEPENDENCIES
 		)
@@ -149,7 +150,7 @@ def build_all():
 		for file in glob.glob(f"{BUILD_PATH}/*.txt"):
 			os.rename(file, f"{BUILD_PATH}/{PAYLOAD_BUILD_FOLDER}/res/{os.path.basename(file)}")
 		#copy any asset
-		for file in glob.glob("{READER_PATH}/res/*"):
+		for file in glob.glob(f"{READER_PATH}/res/*"):
 			shutil.copyfile(file, f"{BUILD_PATH}/{PAYLOAD_BUILD_FOLDER}/res/{os.path.basename(file)}")
 
 		print("zipping...")
@@ -168,7 +169,7 @@ def build_all():
 			f"{BUILD_PATH}/{CONVERTER_BUILD_FOLDER}/{CONV_BUILD_NAME}",
 			f"{BUILD_PATH}/{PAYLOAD_BUILD_FOLDER}/{READER_NAME}.pyw"
 		]
-		files_for_cleanup += glob.glob(f"{BUILD_PATH}/{PAYLOAD_BUILD_FOLDER}/res/*.txt") + glob.glob(f"{BUILD_PATH}/*.txt")
+		files_for_cleanup += glob.glob(f"{BUILD_PATH}/{PAYLOAD_BUILD_FOLDER}/res/*.txt") + glob.glob(f"{BUILD_PATH}/{PAYLOAD_BUILD_FOLDER}/res/*.png") + glob.glob(f"{BUILD_PATH}/*.txt")
 		files_for_cleanup += glob.glob(f"{BUILD_PATH}/{CONVERTER_BUILD_FOLDER}/*.dll")
 		dirs_for_cleanup = [
 			f"{BUILD_PATH}/{CONVERTER_BUILD_FOLDER}",
