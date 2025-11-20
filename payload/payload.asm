@@ -70,7 +70,7 @@ ENDM
 ; (could've just as well JPed to any RET in ROM, but i prefer this tbh)
 ; TODO: we do some calls later in the code. we can just reuse those i guess
 BEGINNING::
-call $0060
+call $0060		; TODO: EVEN DUMBER IDEA TIME: there's got to be a function in the whole ROM that sets the registers to what we need and then returns, allowing us to save three or at least one byte (please) on the first load???
 ; dec sp		\__ these would be done here but they're done later as this saves a load at the end of the code (by forcing codediff == 0x01, see below)
 ; dec sp		/
 
@@ -178,7 +178,7 @@ ENGINE_CALLS::
 ld A,1
 ldh [hTextID],A						; FF8C
 ; farcall DisplayTextIDInit: call DisplayTextIDInit which is outside of the current ROM bank (need to check argument (0 is ID for start menu))
-inc b								; equivalent to `ld B, 1` as B was zero before
+inc B								; equivalent to `ld B, 1` as B was zero before (we need to load bank 1, which is where DisplayTextIDInit resides)
 ld HL,DisplayTextIDInit
 call BankSwitch
 
