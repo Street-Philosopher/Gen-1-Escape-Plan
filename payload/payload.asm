@@ -71,8 +71,8 @@ ENDM
 ; TODO: we do some calls later in the code. we can just reuse those i guess
 BEGINNING::
 call $0060
-dec sp
-dec sp
+; dec sp		\__ these would be done here but they're done later as this saves a load at the end of the code (by forcing codediff == 0x01, see below)
+; dec sp		/
 
 ; TODO: instead of PUSHing we could write directly in memory maybe. freeing the stack would allow for some other optimisations
 
@@ -88,6 +88,9 @@ dec sp
 GENERATE_STRING_ON_STACK::
 ; init
 ld HL,wBoxMons
+; moved here instead of after `call $0060`
+dec sp
+dec sp
 ; paired register load
 ld DE,(12 << 8)+3
 ; ld D,11+1			; the +2 is for easier alignment later. this way we end up PUSHing 48 chars (=> 96 bytes)
@@ -186,6 +189,7 @@ call PrintText						; 3C49
 call YesNoChoice
 ld A, [wCurrentMenuItem]
 ; BC is always zero after this call. this info allows us to save one byte later on by loading to C instead of BC
+; UPDATE: it doesn't anymore, we removed the load entirely lol. still going to leave it here bc i like it
 ; call stack for YesNoChoice goes something like:
 ; call YesNoChoice
 ;   jr DisplayYesNoChoice
@@ -208,10 +212,14 @@ ret nz
 ; if YesNoChoice == 1:
 ; ahhh self-modifying code. what could go wrong?
 ; first, calculate the address of the byte to modify into HL. then 16bit-add 33 (size of one mon in the box) to it
+inc HL
+; basically: the PC we PUSHed at the beginning of the program points to `ld HL,current_mon`
+; we want to increase the `current_mon` pointer only. if we didn't `inc HL` we'd be increasing the `ld HL,XXXX` instruction itself, which is not just bad it's catastrophic
 DEF codediff = ((GENERATE_STRING_ON_STACK - BEGINNING) - 2) 
-ASSERT codediff <= 0xFF
-ld C, codediff				; \___ HL (= start of the program) += (difference between start of the program and address of mon data, that we luckily only use once)
-add HL, BC					; /
+ASSERT codediff == 0x01
+; because codediff == 0x01, we can just `inc hl` to get what we want, instead of ADDing like before (early code for reference)
+; ld C, codediff				; \___ HL (= start of the program) += (difference between start of the program and address of mon data, that we luckily only use once)
+; add HL, BC					; /
 
 ld A,[HL]				; word x = *HL
 add A,33				; low(x) += 33 (number of bytes for one pokemon in the box)
